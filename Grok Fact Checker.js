@@ -7,9 +7,9 @@
 // @name:es      Grok Verificador de Datos
 // @name:pt-BR   Grok Verificador de Fatos
 // @name:fr      Grok Vérificateur de Faits
-// @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07?locale_override=1
-// @namespace    https://github.com/Startanuki07
-// @version      1.3
+// @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
+// @homepageURL  https://github.com/Startanuki07
+// @version      1.5.0.1
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -121,7 +121,7 @@
         custom_prompt_placeholder: "输入自定义 AI 问答指令...\n\n（帖子链接将自动附加在末尾）",
         custom_prompt_save: "💾 保存设置",
         custom_prompt_saved: "✅ 已保存",
-        highlight_url_checkbox: "填入後反白貼文链接（方便手动删除）",
+        highlight_url_checkbox: "填入后反白贴文链接（方便手动删除）",
         unsaved_title: "有未保存的更改",
         unsaved_save_close: "💾 保存并关闭",
         unsaved_discard: "不保存，直接关闭",
@@ -471,6 +471,12 @@
   };
   ICONS.GROK = ICONS.ROBOT;
 
+  const PLATFORM_DEFS = [
+    { key: "grok",    name: "Grok",    color: "#1d9bf0" },
+    { key: "chatgpt", name: "ChatGPT", color: "#10a37f" },
+    { key: "gemini",  name: "Gemini",  color: "#8b5cf6" },
+  ];
+
   function registerMenus() {
     const isAutoSend = GM_getValue("cfg_auto_send", false);
     const autoSendText = isAutoSend ? "✅ ON" : "❌ OFF";
@@ -632,6 +638,7 @@
     return null;
   }
 
+  const _adsHidden = new WeakSet();
   function removeGrokAds() {
     const keywords = [
       "建立重複工作",
@@ -644,7 +651,10 @@
       if (!el.innerText) return;
       if (keywords.some((kw) => el.innerText.includes(kw))) {
         const btn = el.closest("button");
-        if (btn) btn.style.display = "none";
+        if (btn && !_adsHidden.has(btn)) {
+          btn.style.display = "none";
+          _adsHidden.add(btn);
+        }
       }
     });
   }
@@ -777,6 +787,16 @@
     highlightRow.appendChild(highlightLabel);
     panel.appendChild(highlightRow);
 
+    const highlightNote = document.createElement("div");
+    highlightNote.style.cssText = "font-size:11px;color:#8899a6;padding:2px 0 0 26px;line-height:1.5;";
+    highlightNote.innerText = "⚠️ Grok only — ChatGPT uses a rich-text editor that does not support text selection via script.";
+    function updateHighlightNote() {
+      const enabled = getEnabledPlatforms();
+      highlightNote.style.display = enabled.includes("chatgpt") ? "block" : "none";
+    }
+    updateHighlightNote();
+    panel.appendChild(highlightNote);
+
     const platformLabel = document.createElement("div");
     platformLabel.className = "grok-settings-section-label";
     platformLabel.style.marginTop = "6px";
@@ -802,7 +822,7 @@
         "zh-TW": "⚠️ Gemini 目前不支援模版自動填入功能\n\n跳轉後需手動貼上內容，且無法自動切換暫時聊天模式。\n\n確定要強制開啟 Gemini 選項嗎？",
         "zh-CN": "⚠️ Gemini 目前不支持模板自动填入功能\n\n跳转后需手动粘贴内容，且无法自动切换临时聊天模式。\n\n确定要强制开启 Gemini 选项吗？",
         "ja":    "⚠️ Gemini は現在テンプレートの自動入力に対応していません\n\n開いた後は手動でテキストを貼り付けてください。一時チャットへの自動切替もできません。\n\nGemini を強制的に有効にしますか？",
-        "ko":    "⚠️ Gemini는 현재 템플릿 자동 입력을 지원하지 않습니다\n\n열린 후 수동으로 내용을 붙여넣으세요. 임시 채팅 자동 전환도 불가합니다.\n\nGemini를 강제로 활성화하시겠습니까？",
+        "ko":    "⚠️ Gemini는 현재 템플릿 자동 입력을 지원하지 않습니다\n\n열린 후 수동으로 내용을 붙여넣으세요. 임시 채팅 자동 전환도 불가합니다.\n\nGemini를 강제로 활성화하시겠습니까?",
         "en":    "⚠️ Gemini does not currently support auto-fill templates.\n\nYou will need to paste the content manually after opening. Automatic Temporary Chat switching is also unavailable.\n\nForce-enable Gemini anyway?",
         "es":    "⚠️ Gemini no admite actualmente el relleno automático de plantillas.\n\nDeberás pegar el contenido manualmente. El cambio automático al chat temporal tampoco está disponible.\n\n¿Forzar la activación de Gemini?",
         "pt-BR": "⚠️ O Gemini não suporta preenchimento automático de modelos no momento.\n\nVocê precisará colar o conteúdo manualmente. A troca automática para chat temporário também não está disponível.\n\nForçar ativação do Gemini mesmo assim?",
@@ -849,7 +869,7 @@
 
       const nameEl = document.createElement("span");
       if (EXPERIMENTAL_KEYS.has(key)) {
-        nameEl.innerHTML = `${name} <span style="color:#f4212e;font-size:11px;font-weight:600;">(⚠️ 實驗性)</span>`;
+        nameEl.innerHTML = `${name} <span style="color:#f4212e;font-size:11px;font-weight:600;">(⚠️ Experimental)</span>`;
       } else {
         nameEl.innerText = name;
       }
@@ -874,6 +894,9 @@
       chk.addEventListener("change", () => {
         const anyChecked = Object.values(platformCheckboxes).some(c => c.checked);
         platformWarn.style.display = anyChecked ? "none" : "block";
+        const checkedKeys = Object.entries(platformCheckboxes)
+          .filter(([, c]) => c.checked).map(([k]) => k);
+        highlightNote.style.display = checkedKeys.includes("chatgpt") ? "block" : "none";
       });
     });
 
@@ -902,13 +925,24 @@
     langLabel.innerText = LangSystem.getText("lang_section_title");
     panel.appendChild(langLabel);
 
-    const currentCode = GM_getValue("cfg_lang_code", "zh-TW");
+    const currentCode = GM_getValue("cfg_lang_code", null);
+    const activeLangCode = currentCode || (() => {
+      const navLang = navigator.language.toLowerCase();
+      if (navLang.includes("zh-hant") || navLang.includes("zh-tw") || navLang.includes("zh-hk")) return "zh-TW";
+      if (navLang.includes("zh-hans") || navLang.includes("zh-cn") || navLang.includes("zh")) return "zh-CN";
+      if (navLang.includes("ja")) return "ja";
+      if (navLang.includes("ko")) return "ko";
+      if (navLang.includes("pt")) return "pt-BR";
+      if (navLang.includes("fr")) return "fr";
+      if (navLang.includes("es")) return "es";
+      return "en";
+    })();
     const langList = document.createElement("div");
     langList.className = "grok-lang-list";
     Object.keys(LANG_DICT).forEach((code) => {
       const btn = document.createElement("button");
       btn.className = "grok-lang-btn";
-      if (code === currentCode) btn.classList.add("active");
+      if (code === activeLangCode) btn.classList.add("active");
       btn.innerText = LANG_DICT[code].name;
       btn.onclick = () => {
         LangSystem.setKey(code);
@@ -924,7 +958,7 @@
       enabled:   GM_getValue("cfg_custom_prompt_enabled", false),
       prompt:    GM_getValue("cfg_custom_prompt", "").trim(),
       highlight: GM_getValue("cfg_highlight_url", false),
-      platforms: GM_getValue("cfg_platforms", '["grok","chatgpt","gemini"]'),
+      platforms: GM_getValue("cfg_platforms", '["grok"]'),
     };
 
     function hasUnsavedChanges() {
@@ -1659,12 +1693,6 @@
     }, 400);
   }
 
-  const PLATFORM_DEFS = [
-    { key: "grok",    name: "Grok",    color: "#1d9bf0" },
-    { key: "chatgpt", name: "ChatGPT", color: "#10a37f" },
-    { key: "gemini",  name: "Gemini",  color: "#8b5cf6" },
-  ];
-
   function getEnabledPlatforms() {
     try {
       const val = GM_getValue("cfg_platforms", null);
@@ -1674,11 +1702,18 @@
   }
 
   function buildTabUrl(platform, text, forceSend) {
+    function encodePayload(str) {
+      const bytes = new TextEncoder().encode(str);
+      let binary = "";
+      for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+      return btoa(binary);
+    }
     if (platform === "grok") {
-      const encoded = btoa(unescape(encodeURIComponent(text)));
+      const encoded = encodePayload(text);
       return `${GROK_URL}#gfc|${forceSend ? "1" : "0"}|${encoded}`;
     }
     if (platform === "chatgpt") {
+      GM_setValue("chatgpt_payload", text);
       GM_setValue("chatgpt_force_send", forceSend);
       GM_setValue("chatgpt_ts", Date.now());
       return `https://chatgpt.com/?prompt=${encodeURIComponent(text)}`;
@@ -1687,7 +1722,7 @@
       GM_setValue("gemini_payload", text);
       GM_setValue("gemini_force_send", forceSend);
       GM_setValue("gemini_ts", Date.now());
-      const encoded = btoa(unescape(encodeURIComponent(text)));
+      const encoded = encodePayload(text);
       return `https://gemini.google.com/#gfc|${forceSend ? "1" : "0"}|${encoded}`;
     }
     return null;
@@ -1783,7 +1818,11 @@
         btn.classList.remove("charging");
         btn.style.transition = "all 0.2s";
         btn.style.transform = "scale(1)";
-        if (btn.innerHTML !== ICONS.SENDING) btn.innerHTML = ICONS.ROBOT;
+        if (btn.innerHTML !== ICONS.SENDING) {
+          btn.innerHTML = getPlatformIcon(
+            (_initPlatforms.length === 1 && _initPlatforms[0] !== "grok") ? _initPlatforms[0] : "grok"
+          );
+        }
       }
     });
     btn.addEventListener("mouseup", (e) => {
@@ -1801,8 +1840,10 @@
       function buildPayloadFor(platform) {
         if (platform === "chatgpt") {
           const content = getContentFn ? getContentFn() : "";
-          const body = content && content.trim() ? content.trim() : url;
-          return `${currentPrompt}${body}`;
+          if (content && content.trim()) {
+            return `${currentPrompt}${content.trim()}\n${url}`;
+          }
+          return `${currentPrompt}${url}`;
         }
         return `${currentPrompt}${url}`;
       }
@@ -1856,6 +1897,7 @@
       const toolbar = article.querySelector('div[role="group"]');
       if (!toolbar) return;
       if (toolbar.querySelector(".my-grok-robot-btn")) return;
+      if (!article.querySelector('[data-testid="tweetText"]')) return;
 
       const getUrl = () => {
         const linkElement = article.querySelector('a[href*="/status/"] > time');
@@ -1947,25 +1989,40 @@
       observer.observe(document.body, { childList: true, subtree: true });
       console.log("Grok Checker: Bluesky 模式啟動");
     },
+    injectButton: (item, toolbar) => {
+      if (toolbar.querySelector(".my-grok-robot-btn")) return;
+      const robotBtn = createGrokButton(
+        () => AdapterBluesky.getUrl(item),
+        false,
+        () => AdapterBluesky.getText(item),
+      );
+      const rightGroup = toolbar.lastElementChild;
+      if (rightGroup) toolbar.insertBefore(robotBtn, rightGroup);
+      else toolbar.appendChild(robotBtn);
+    },
     scan: () => {
-      document
-        .querySelectorAll('[data-testid^="feedItem-by-"]')
-        .forEach((item) => {
+      const containerEls = document.querySelectorAll(
+        '[data-testid^="feedItem-by-"], [data-testid^="postThreadItem-by-"]'
+      );
+      if (containerEls.length > 0) {
+        containerEls.forEach((item) => {
           const replyBtn = item.querySelector('[data-testid="replyBtn"]');
           if (!replyBtn) return;
           const toolbar = replyBtn.parentElement?.parentElement;
           if (!toolbar) return;
-          if (toolbar.querySelector(".my-grok-robot-btn")) return;
-
-          const robotBtn = createGrokButton(
-            () => AdapterBluesky.getUrl(item),
-            false,
-            () => AdapterBluesky.getText(item),
-          );
-          const rightGroup = toolbar.lastElementChild;
-          if (rightGroup) toolbar.insertBefore(robotBtn, rightGroup);
-          else toolbar.appendChild(robotBtn);
+          AdapterBluesky.injectButton(item, toolbar);
         });
+      } else {
+        document
+          .querySelectorAll('[data-testid="replyBtn"]')
+          .forEach((replyBtn) => {
+            const toolbar = replyBtn.parentElement?.parentElement?.parentElement;
+            const item    = toolbar?.parentElement;
+            if (!toolbar || !item) return;
+            if (!item.querySelector('[data-testid="postText"]')) return;
+            AdapterBluesky.injectButton(item, toolbar);
+          });
+      }
     },
     getUrl: (item) => {
       const links = item.querySelectorAll('a[href*="/post/"]');
@@ -1973,10 +2030,8 @@
       return window.location.href;
     },
     getText: (item) => {
-      for (const el of item.querySelectorAll("div.css-146c3p1")) {
-        const text = el.innerText?.trim();
-        if (text && text.length > 0) return text;
-      }
+      const postTextEl = item.querySelector('[data-testid="postText"]');
+      if (postTextEl) return postTextEl.innerText?.trim() || "";
       return "";
     },
   };
@@ -2053,7 +2108,8 @@
           const parts = hash.slice(1).split("|");
           if (parts.length < 3) return null;
           const forceSend = parts[1] === "1";
-          const payload = decodeURIComponent(escape(atob(parts.slice(2).join("|"))));
+          const bytes = Uint8Array.from(atob(parts.slice(2).join("|")), c => c.charCodeAt(0));
+          const payload = new TextDecoder().decode(bytes);
           if (payload.length > 5000 || /[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(payload)) {
             console.warn("[GrokCheck] Suspicious payload rejected (length or control chars).");
             return null;
@@ -2102,7 +2158,6 @@
 
       window.addEventListener('beforeunload', () => {
         obs.disconnect();
-        console.log('[GrokCheck] MutationObserver disconnected');
       });
     } else if (window.location.hostname === "chatgpt.com") {
       const ts       = GM_getValue("chatgpt_ts", 0);
@@ -2111,6 +2166,8 @@
       if (isRecent && payload) {
         const forceSend = GM_getValue("chatgpt_force_send", false);
         GM_setValue("chatgpt_ts", 0);
+        GM_setValue("chatgpt_payload", "");
+        GM_setValue("chatgpt_force_send", false);
         const delay = document.readyState === "loading" ? 2000 : 1500;
         const run = () => setTimeout(() => runChatGPTAutomation(forceSend), delay);
         if (document.readyState === "loading") {
@@ -2127,7 +2184,8 @@
           const parts = hash.slice(1).split("|");
           if (parts.length < 3) return null;
           const forceSend = parts[1] === "1";
-          const payload = decodeURIComponent(escape(atob(parts.slice(2).join("|"))));
+          const bytes = Uint8Array.from(atob(parts.slice(2).join("|")), c => c.charCodeAt(0));
+          const payload = new TextDecoder().decode(bytes);
           if (payload.length > 5000 || /[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(payload)) {
             console.warn("[GrokCheck] Gemini: suspicious payload rejected.");
             return null;
@@ -2147,6 +2205,8 @@
         const force   = GM_getValue("gemini_force_send", false);
         if (payload && (Date.now() - ts) < 30000) {
           GM_setValue("gemini_payload", "");
+          GM_setValue("gemini_force_send", false);
+          GM_setValue("gemini_ts", 0);
           runGeminiAutomation(payload, force);
         }
       }
