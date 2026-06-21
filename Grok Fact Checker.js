@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.5.0.1
+// @version      1.5.0.2
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -420,8 +420,8 @@
       const code = LangSystem.getKey();
       if (code && LANG_DICT[code]) return LANG_DICT[code];
 
-      const browserLang = navigator.language;
-      if (browserLang.includes("zh-CN")) return LANG_DICT["zh-CN"];
+      const browserLang = navigator.language.toLowerCase();
+      if (browserLang.includes("zh-cn") || browserLang.includes("zh-hans")) return LANG_DICT["zh-CN"];
       if (browserLang.includes("zh")) return LANG_DICT["zh-TW"];
       if (browserLang.includes("ja")) return LANG_DICT["ja"];
       if (browserLang.includes("ko")) return LANG_DICT["ko"];
@@ -693,10 +693,10 @@
     curtainElement.className = "grok-curtain-overlay";
     curtainMsgElement = document.createElement("div");
     curtainMsgElement.className = "grok-curtain-text";
-    curtainMsgElement.innerHTML = initialText;
+    curtainMsgElement.textContent = initialText;
     curtainSubElement = document.createElement("div");
     curtainSubElement.className = "grok-curtain-sub";
-    curtainSubElement.innerHTML = subText;
+    curtainSubElement.textContent = subText;
     curtainElement.appendChild(curtainMsgElement);
     curtainElement.appendChild(curtainSubElement);
     document.body.appendChild(curtainElement);
@@ -706,8 +706,8 @@
 
   function updateCurtainText(text, sub = null) {
     if (!CURTAIN_ENABLED) return;
-    if (curtainMsgElement) curtainMsgElement.innerHTML = text;
-    if (sub !== null && curtainSubElement) curtainSubElement.innerHTML = sub;
+    if (curtainMsgElement) curtainMsgElement.textContent = text;
+    if (sub !== null && curtainSubElement) curtainSubElement.textContent = sub;
   }
 
   function hideCurtain(delay = 500) {
@@ -904,9 +904,13 @@
     saveBtn.className = "grok-save-btn";
     saveBtn.innerText = LangSystem.getText("custom_prompt_save");
     saveBtn.onclick = () => {
-      GM_setValue("cfg_custom_prompt_enabled", checkbox.checked);
-      GM_setValue("cfg_custom_prompt", textarea.value.trim());
-      GM_setValue("cfg_highlight_url", highlightChk.checked);
+      doSave();
+      initialState.enabled   = checkbox.checked;
+      initialState.prompt    = textarea.value.trim();
+      initialState.highlight = highlightChk.checked;
+      initialState.platforms = JSON.stringify(
+        PLATFORM_DEFS.map(p => p.key).filter(k => platformCheckboxes[k]?.checked)
+      );
       saveBtn.innerText = LangSystem.getText("custom_prompt_saved");
       saveBtn.classList.add("saved");
       setTimeout(() => {
@@ -1584,43 +1588,32 @@
       );
     }
 
+    function startAutoSend() {
+      if (!forceSend) return;
+      let sendAttempts = 0;
+      const sendInterval = setInterval(() => {
+        sendAttempts++;
+        const btn = findChatGPTSendBtn();
+        if (btn && !btn.disabled && btn.getAttribute("aria-disabled") !== "true") {
+          clearInterval(sendInterval);
+          btn.click();
+        } else if (sendAttempts >= 40) {
+          clearInterval(sendInterval);
+        }
+      }, 400);
+    }
+
     let privAttempts = 0;
-    let hasClickedPrivacy = false;
     const privInterval = setInterval(() => {
       privAttempts++;
       const tempBtn = findTempChatBtn();
       if (tempBtn) {
         clearInterval(privInterval);
         tempBtn.click();
-        hasClickedPrivacy = true;
-        if (forceSend) {
-          let sendAttempts = 0;
-          const sendInterval = setInterval(() => {
-            sendAttempts++;
-            const btn = findChatGPTSendBtn();
-            if (btn && !btn.disabled && btn.getAttribute("aria-disabled") !== "true") {
-              clearInterval(sendInterval);
-              btn.click();
-            } else if (sendAttempts >= 40) {
-              clearInterval(sendInterval);
-            }
-          }, 400);
-        }
+        startAutoSend();
       } else if (privAttempts >= 30) {
         clearInterval(privInterval);
-        if (forceSend) {
-          let sendAttempts = 0;
-          const sendInterval = setInterval(() => {
-            sendAttempts++;
-            const btn = findChatGPTSendBtn();
-            if (btn && !btn.disabled && btn.getAttribute("aria-disabled") !== "true") {
-              clearInterval(sendInterval);
-              btn.click();
-            } else if (sendAttempts >= 40) {
-              clearInterval(sendInterval);
-            }
-          }, 400);
-        }
+        startAutoSend();
       }
     }, 300);
   }
@@ -1744,7 +1737,11 @@
 
     const drop = document.createElement("div");
     drop.className = "gfc-plat-drop";
-    drop.style.cssText = `position:fixed;bottom:${window.innerHeight - rect.top + 8}px;left:${Math.max(4, rect.left - 8)}px;`;
+    const dropEstHeight = platforms.length * 42 + 16;
+    const showAbove = rect.top > dropEstHeight + 8;
+    drop.style.cssText = showAbove
+      ? `position:fixed;bottom:${window.innerHeight - rect.top + 8}px;left:${Math.max(4, rect.left - 8)}px;`
+      : `position:fixed;top:${rect.bottom + 8}px;left:${Math.max(4, rect.left - 8)}px;box-shadow:0 4px 24px rgba(0,0,0,0.6);`;
 
     PLATFORM_DEFS.filter(p => platforms.includes(p.key)).forEach(({ key, name, color }) => {
       const item = document.createElement("button");
@@ -1807,7 +1804,7 @@
         isLongPress = true;
         btn.innerHTML = ICONS.ROCKET;
         btn.classList.add("charging");
-      }, 800);
+      }, 1000);
     });
     btn.addEventListener("mouseleave", () => {
       if (pressTimer) {
@@ -1987,7 +1984,7 @@
       AdapterBluesky.scan();
       const observer = new MutationObserver(() => AdapterBluesky.scan());
       observer.observe(document.body, { childList: true, subtree: true });
-      console.log("Grok Checker: Bluesky 模式啟動");
+      console.log("[GrokCheck] Bluesky adapter activated");
     },
     injectButton: (item, toolbar) => {
       if (toolbar.querySelector(".my-grok-robot-btn")) return;
@@ -2046,7 +2043,7 @@
       AdapterMastodon.scan();
       const observer = new MutationObserver(() => AdapterMastodon.scan());
       observer.observe(document.body, { childList: true, subtree: true });
-      console.log("Grok Checker: Mastodon 模式啟動");
+      console.log("[GrokCheck] Mastodon adapter activated");
     },
     scan: () => {
       document
@@ -2081,6 +2078,22 @@
     },
   };
 
+  function decodeGfcHash(hash, label) {
+    if (!hash.startsWith("#gfc|")) return null;
+    try {
+      const parts = hash.slice(1).split("|");
+      if (parts.length < 3) return null;
+      const forceSend = parts[1] === "1";
+      const bytes = Uint8Array.from(atob(parts.slice(2).join("|")), c => c.charCodeAt(0));
+      const payload = new TextDecoder().decode(bytes);
+      if (payload.length > 5000 || /[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(payload)) {
+        console.warn(`[GrokCheck] ${label}: suspicious payload rejected (length or control chars).`);
+        return null;
+      }
+      return { forceSend, payload };
+    } catch (e) { return null; }
+  }
+
   function init() {
     registerMenus();
     if (!GM_getValue("cfg_lang_code")) {
@@ -2102,22 +2115,7 @@
 
     if (window.location.href.includes("/i/grok")) {
       function parseHashPayload() {
-        const hash = location.hash;
-        if (!hash.startsWith("#gfc|")) return null;
-        try {
-          const parts = hash.slice(1).split("|");
-          if (parts.length < 3) return null;
-          const forceSend = parts[1] === "1";
-          const bytes = Uint8Array.from(atob(parts.slice(2).join("|")), c => c.charCodeAt(0));
-          const payload = new TextDecoder().decode(bytes);
-          if (payload.length > 5000 || /[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(payload)) {
-            console.warn("[GrokCheck] Suspicious payload rejected (length or control chars).");
-            return null;
-          }
-          return { forceSend, payload };
-        } catch (e) {
-          return null;
-        }
+        return decodeGfcHash(location.hash, "Grok");
       }
 
       function tryRunAutomation(retriesLeft) {
@@ -2178,20 +2176,7 @@
       }
     } else if (window.location.hostname === "gemini.google.com") {
       function parseGeminiHashPayload() {
-        const hash = location.hash;
-        if (!hash.startsWith("#gfc|")) return null;
-        try {
-          const parts = hash.slice(1).split("|");
-          if (parts.length < 3) return null;
-          const forceSend = parts[1] === "1";
-          const bytes = Uint8Array.from(atob(parts.slice(2).join("|")), c => c.charCodeAt(0));
-          const payload = new TextDecoder().decode(bytes);
-          if (payload.length > 5000 || /[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(payload)) {
-            console.warn("[GrokCheck] Gemini: suspicious payload rejected.");
-            return null;
-          }
-          return { forceSend, payload };
-        } catch (e) { return null; }
+        return decodeGfcHash(location.hash, "Gemini");
       }
 
       function tryRunGemini() {
@@ -2220,10 +2205,10 @@
       if (AdapterBluesky.isMatch()) {
         AdapterBluesky.init();
       } else if (AdapterThreads.isMatch()) {
-        console.log("Grok Checker: Threads 模式啟動");
+        console.log("[GrokCheck] Threads adapter activated");
         AdapterThreads.init();
       } else if (AdapterX.isMatch()) {
-        console.log("Grok Checker: X 模式啟動");
+        console.log("[GrokCheck] X adapter activated");
         AdapterX.init();
       } else {
         const mastodonObserver = new MutationObserver(() => {
