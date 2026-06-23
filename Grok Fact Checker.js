@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.5.0.2
+// @version      1.5.1.0
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -47,7 +47,7 @@
     "zh-TW": {
       name: "🇹🇼 繁體中文 (Traditional Chinese)",
       prompt:
-        "請進行事實查核，詳細分析以下這則貼文的真實性，並指出可能的錯誤或誤導資訊：\n",
+        "請以繁體中文詳細查核以下貼文：分析所有聲明的真實性，指出錯誤、誤導或斷章取義之處，最後給出判斷（屬實／部分屬實／不實／無法核實）：\n",
       ui: {
         menu_auto: "⚙️ 預設自動送出",
         menu_lang: "⚙️ 設定選項及切換語言",
@@ -91,7 +91,7 @@
     "zh-CN": {
       name: "🇨🇳 简体中文 (Simplified Chinese)",
       prompt:
-        "请进行事实核查，详细分析以下帖子的真实性，并指出可能的错误或误导信息：\n",
+        "请以简体中文详细核查以下帖子：分析所有声明的真实性，指出错误、误导或断章取义之处，最后给出判断（属实／部分属实／不实／无法核实）：\n",
       ui: {
         menu_auto: "⚙️ 默认自动发送",
         menu_lang: "⚙️ 设置选项及切换语言",
@@ -135,7 +135,7 @@
     en: {
       name: "🇺🇸 English",
       prompt:
-        "Please fact-check this post. Analyze its authenticity in detail and point out any potential errors or misleading information:\n",
+        "Please thoroughly fact-check the following post in English: analyze all claims for accuracy, flag errors, misleading statements, or out-of-context framing, and give a verdict (TRUE / PARTIALLY TRUE / FALSE / UNVERIFIABLE):\n",
       ui: {
         menu_auto: "⚙️ Auto Send",
         menu_lang: "⚙️ Settings & Language",
@@ -179,7 +179,7 @@
     ja: {
       name: "🇯🇵 日本語 (Japanese)",
       prompt:
-        "以下の投稿の事実確認（ファクトチェック）を行ってください。信憑性を詳細に分析し、誤りや誤解を招く情報があれば指摘してください：\n",
+        "以下の投稿を日本語で詳しくファクトチェックしてください。すべての主張の正確性を分析し、誤り・誤解を招く情報・文脈の歪曲を指摘した上で、判定（事実／部分的に事実／不正確／検証不可）を示してください：\n",
       ui: {
         menu_auto: "⚙️ 自動送信",
         menu_lang: "⚙️ 設定と言語切替",
@@ -223,7 +223,7 @@
     ko: {
       name: "🇰🇷 한국어 (Korean)",
       prompt:
-        "다음 게시물의 사실 여부를 확인해 주세요. 진위를 자세히 분석하고 오류나 오해의 소지가 있는 정보를 지적해 주세요:\n",
+        "다음 게시물을 한국어로 자세히 팩트체크해 주세요. 모든 주장의 사실 여부를 분석하고, 오류·오해의 소지가 있는 정보·맥락 왜곡을 지적한 후 판정(사실／부분적 사실／허위／확인 불가)을 내려 주세요：\n",
       ui: {
         menu_auto: "⚙️ 자동 전송",
         menu_lang: "⚙️ 설정 및 언어 전환",
@@ -267,7 +267,7 @@
     es: {
       name: "🇪🇸 Español (Spanish)",
       prompt:
-        "Por favor, verifica los datos de esta publicación. Analiza su autenticidad en detalle y señala cualquier posible error o información engañosa:\n",
+        "Por favor, verifica exhaustivamente la siguiente publicación en español: analiza la veracidad de todas las afirmaciones, señala errores, información engañosa o descontextualización, y emite un veredicto (VERDADERO / PARCIALMENTE VERDADERO / FALSO / NO VERIFICABLE):\n",
       ui: {
         menu_auto: "⚙️ Envío automático",
         menu_lang: "⚙️ Configuración e idioma",
@@ -311,7 +311,7 @@
     "pt-BR": {
       name: "🇧🇷 Português BR (Portuguese)",
       prompt:
-        "Por favor, verifique os fatos desta publicação. Analise sua autenticidade em detalhes e aponte possíveis erros ou informações enganosas:\n",
+        "Por favor, verifique detalhadamente os fatos da seguinte publicação em português: analise a veracidade de todas as afirmações, sinalize erros, informações enganosas ou contexto distorcido, e emita um veredicto (VERDADEIRO / PARCIALMENTE VERDADEIRO / FALSO / NÃO VERIFICÁVEL):\n",
       ui: {
         menu_auto: "⚙️ Envio automático",
         menu_lang: "⚙️ Configurações e idioma",
@@ -355,7 +355,7 @@
     fr: {
       name: "🇫🇷 Français (French)",
       prompt:
-        "Veuillez vérifier les faits de cette publication. Analysez son authenticité en détail et signalez toute erreur potentielle ou information trompeuse :\n",
+        "Veuillez vérifier en détail les informations de la publication suivante en français : analysez la véracité de toutes les affirmations, signalez les erreurs, informations trompeuses ou éléments sortis de leur contexte, et donnez un verdict (VRAI / PARTIELLEMENT VRAI / FAUX / NON VÉRIFIABLE) :\n",
       ui: {
         menu_auto: "⚙️ Envoi automatique",
         menu_lang: "⚙️ Paramètres et langue",
@@ -399,9 +399,13 @@
   };
 
   const LangSystem = {
-    getKey: () => GM_getValue("cfg_lang_code", null),
+    _currentKey: GM_getValue("cfg_lang_code", null),
+
+    getKey: () => LangSystem._currentKey,
     setKey: (code) => {
-      if (LANG_DICT[code]) GM_setValue("cfg_lang_code", code);
+      if (!LANG_DICT[code]) return;
+      LangSystem._currentKey = code;
+      GM_setValue("cfg_lang_code", code);
     },
 
     getCustom: () => {
@@ -581,6 +585,20 @@
         @keyframes gfc-drop-in {
             from { opacity: 0; transform: translateY(6px) translateZ(0); }
             to   { opacity: 1; transform: translateY(0)   translateZ(0); }
+        }
+        
+        .gfc-lang-toast {
+            position: fixed; top: 24px; left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            background: #16181c; border: 1px solid #00ba7c;
+            color: #00ba7c; padding: 8px 22px; border-radius: 20px;
+            font-size: 13px; font-weight: 600; white-space: nowrap;
+            opacity: 0; pointer-events: none; z-index: 2147483647;
+            transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .gfc-lang-toast--visible {
+            opacity: 1; transform: translateX(-50%) translateY(0);
         }
         .gfc-plat-item {
             display: flex; align-items: center; gap: 10px;
@@ -805,7 +823,7 @@
 
     const enabledPlatformsInit = getEnabledPlatforms();
     const platformCheckboxes = {};
-    const PLAT_COLORS = { grok: "#1d9bf0", chatgpt: "#10a37f", gemini: "#8b5cf6" };
+    const PLAT_COLORS = Object.fromEntries(PLATFORM_DEFS.map(p => [p.key, p.color]));
 
     const EXPERIMENTAL_WARN_MSG = {
       chatgpt: {
@@ -950,7 +968,23 @@
       btn.innerText = LANG_DICT[code].name;
       btn.onclick = () => {
         LangSystem.setKey(code);
-        setTimeout(() => location.reload(), 150);
+        document.querySelectorAll(".my-grok-robot-btn").forEach(b => {
+          b.title = LangSystem.getText("btn_title");
+        });
+        if (hasUnsavedChanges()) doSave();
+        doClose();
+        setTimeout(() => {
+          showLanguageSelectionUI();
+          const toast = document.createElement("div");
+          toast.className = "gfc-lang-toast";
+          toast.textContent = "✓  " + (LANG_DICT[code]?.name || code);
+          document.body.appendChild(toast);
+          requestAnimationFrame(() => toast.classList.add("gfc-lang-toast--visible"));
+          setTimeout(() => {
+            toast.classList.remove("gfc-lang-toast--visible");
+            setTimeout(() => toast.remove(), 300);
+          }, 2200);
+        }, 360);
       };
       langList.appendChild(btn);
     });
@@ -1037,7 +1071,9 @@
     panel.appendChild(closeBtn);
 
     overlay.appendChild(panel);
+    overlay.style.opacity = "0";
     document.body.appendChild(overlay);
+    requestAnimationFrame(() => { overlay.style.opacity = ""; });
   }
 
   function buildCustomLangTemplate() {
@@ -1389,8 +1425,8 @@
   let _grokAutomationRan = false;
 
   function runGrokAutomation(hashData = null) {
-    const payload = hashData?.payload ?? GM_getValue("check_payload", "");
-    const forceSend = hashData?.forceSend ?? GM_getValue("force_direct_send", false);
+    const payload   = hashData?.payload   ?? "";
+    const forceSend = hashData?.forceSend ?? false;
     if (!payload) { console.warn("[GrokCheck] runGrokAutomation: no payload, abort"); return; }
     if (_automationRunning || _grokAutomationRan) return;
     _automationRunning = true;
@@ -1401,10 +1437,11 @@
     const configAutoSend = GM_getValue("cfg_auto_send", false);
     const shouldSend = forceSend || configAutoSend;
 
-    let statusTitle = shouldSend
-      ? LangSystem.getText("mode_direct")
-      : LangSystem.getText("mode_std");
-    if (forceSend) statusTitle = LangSystem.getText("mode_fast");
+    const statusTitle = forceSend
+      ? LangSystem.getText("mode_fast")
+      : shouldSend
+        ? LangSystem.getText("mode_direct")
+        : LangSystem.getText("mode_std");
 
     showCurtain(LangSystem.getText("init"), statusTitle);
     removeGrokAds();
@@ -1718,6 +1755,7 @@
       const encoded = encodePayload(text);
       return `https://gemini.google.com/#gfc|${forceSend ? "1" : "0"}|${encoded}`;
     }
+    console.warn(`[GrokCheck] buildTabUrl: unknown platform "${platform}"`);
     return null;
   }
 
@@ -2120,12 +2158,10 @@
 
       function tryRunAutomation(retriesLeft) {
         const hashData = parseHashPayload();
-        const gmVal = GM_getValue("is_fact_checking", false);
-        if (hashData || gmVal) {
+        if (hashData) {
           runGrokAutomation(hashData);
         } else if (retriesLeft > 0) {
           setTimeout(() => tryRunAutomation(retriesLeft - 1), 200);
-        } else {
         }
       }
 
