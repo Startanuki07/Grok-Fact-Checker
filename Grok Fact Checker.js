@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.5.1.0
+// @version      1.5.1.1
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -508,6 +508,8 @@
         .my-grok-robot-btn:hover { background-color: rgba(29, 155, 240, 0.1); color: rgb(29, 155, 240); }
         .my-grok-robot-btn.charging { color: #f91880; background-color: rgba(249, 24, 128, 0.1); transform: scale(1.15); }
         .my-grok-robot-btn svg { width: 20px; height: 20px; }
+        
+        .my-grok-robot-btn.tm-native-sized { width: auto !important; height: auto !important; }
 
         .grok-curtain-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -1818,10 +1820,18 @@
     setTimeout(() => document.addEventListener("click", closeHandler, true), 0);
   }
 
-  function createGrokButton(getUrlFn, isThreads = false, getContentFn = null) {
-    const btn = document.createElement("button");
-    btn.className = "my-grok-robot-btn";
+  function createGrokButton(getUrlFn, isThreads = false, getContentFn = null, cloneSource = null) {
+    const btn = cloneSource ? cloneSource.cloneNode(true) : document.createElement("button");
+    btn.classList.add("my-grok-robot-btn");
     if (isThreads) btn.classList.add("threads-grok-btn");
+    if (cloneSource) {
+      btn.classList.add("tm-native-sized");
+      btn.removeAttribute("data-testid");
+      btn.removeAttribute("id");
+      btn.querySelectorAll("[data-testid], [id]").forEach((_el) => { _el.removeAttribute("data-testid"); _el.removeAttribute("id"); });
+      btn.querySelectorAll("button, [role=\"button\"]").forEach((_el) => _el.removeAttribute("disabled"));
+      btn.setAttribute("role", "button");
+    }
     const _initPlatforms = getEnabledPlatforms();
     btn.innerHTML = getPlatformIcon(
       (_initPlatforms.length === 1 && _initPlatforms[0] !== "grok") ? _initPlatforms[0] : "grok"
@@ -1954,12 +1964,9 @@
         return tweetTextEl ? (tweetTextEl.innerText?.trim() || "") : "";
       };
 
-      const btn = createGrokButton(getUrl, false, getContent);
-      const wrapper = document.createElement("div");
-      wrapper.style.cssText =
-        "display:flex;align-items:center;justify-content:center;";
-      wrapper.appendChild(btn);
-      toolbar.appendChild(wrapper);
+      const _cloneSrc = toolbar.children[toolbar.children.length - 1] || null;
+      const btn = createGrokButton(getUrl, false, getContent, _cloneSrc);
+      toolbar.appendChild(btn);
     },
   };
 
