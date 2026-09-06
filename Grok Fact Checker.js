@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.5.1.1
+// @version      1.6.0.0
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -25,12 +25,13 @@
 // @match        https://*.mastodon.social/*
 // @match        https://gemini.google.com/*
 // @match        https://chatgpt.com/*
+// @match        https://www.meta.ai/*
 // @grant        GM_openInTab
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
 // @run-at       document-end
-// @description      Adds a 🤖 fact-check button to every post on X (Twitter), Threads, Bluesky, and Mastodon. Click to open Grok in a new private tab with a pre-filled prompt and post URL — privacy mode and focus mode are applied automatically. Long-press for instant auto-send. Includes Grok ad removal and multi-language auto-detection. Best suited for users who occasionally encounter unfamiliar news or claims and want a quick, discreet way to verify them.
+// @description      Adds a 🤖 fact-check button to posts on X, Threads, Bluesky, and Mastodon. Opens Grok, ChatGPT, Gemini, or Meta AI in a new private tab with a pre-filled prompt and post URL. Privacy/focus modes apply automatically. Long-press to auto-send. Includes Grok ad removal and multi-language detection. Note: Meta AI requires Facebook/Instagram login. Ideal for quickly and discreetly verifying unfamiliar news or claims.
 // @description:zh-TW 在 X (Twitter)、Threads、Bluesky 與 Mastodon 每則貼文旁加入 🤖 事實查核按鈕。點擊後自動在新分頁以私人模式開啟 Grok，填入查核 Prompt 與貼文網址，並自動切換隱私模式與專注模式，不留查核紀錄。長按可強制自動送出。附帶自動移除 Grok 廣告、多語言自動偵測。適合偶爾看到不確定的資訊、想低調快速查核的一般用戶。
 // @description:zh-CN 在 X (Twitter)、Threads、Bluesky 与 Mastodon 每条帖子旁添加 🤖 事实核查按钮。点击后自动在新标签页以隐私模式打开 Grok，填入查核 Prompt 与帖子链接，并自动切换隐私模式与专注模式，不留查核记录。长按可强制自动发送。附带自动移除 Grok 广告、多语言自动检测。适合偶尔遇到存疑信息、想低调快速核查的普通用户。
 // @description:ja    X (Twitter)・Threads・Bluesky・Mastodon の各投稿に 🤖 ファクトチェックボタンを追加。クリックで新しいタブにプライベートモードで Grok を起動し、プロンプトと投稿 URL を自動入力。プライバシーモードと集中モードも自動で適用されるため、チェック履歴が残りません。長押しで強制自動送信。Grok 広告の自動除去・多言語自動検出にも対応。
@@ -50,7 +51,7 @@
         "請以繁體中文詳細查核以下貼文：分析所有聲明的真實性，指出錯誤、誤導或斷章取義之處，最後給出判斷（屬實／部分屬實／不實／無法核實）：\n",
       ui: {
         menu_auto: "⚙️ 預設自動送出",
-        menu_lang: "⚙️ 設定選項及切換語言",
+        menu_lang: "⚙️ 設定面板",
         init: "環境初始化...",
         mode_direct: "🚀 直出模式 (自動送出)",
         mode_std: "🛡️ 標準模式 (僅填寫)",
@@ -84,8 +85,20 @@
         unsaved_cancel: "取消",
         platform_section: "🤖 AI 平台選擇",
         platform_at_least_one: "⚠️ 至少需要選擇一個平台",
+        open_fg: "前景開啟",
+        open_bg: "背景開啟",
         btn_title: "點擊：查核 ／ 長按 1 秒：強制自動送出",
         close_btn: "❌ 關閉",
+        tab_template: "模版",
+        tab_platform: "平台",
+        tab_language: "語言",
+        custom_lang_section: "✏️ 自訂語言",
+        custom_lang_loaded: "已載入：",
+        custom_lang_none: "尚未載入自訂語言。",
+        custom_lang_export: "📤 匯出模版",
+        custom_lang_import: "📥 匯入翻譯",
+        custom_lang_clear_title: "移除自訂語言",
+        unsaved_footer_hint: "有未儲存的變更",
       },
     },
     "zh-CN": {
@@ -94,7 +107,7 @@
         "请以简体中文详细核查以下帖子：分析所有声明的真实性，指出错误、误导或断章取义之处，最后给出判断（属实／部分属实／不实／无法核实）：\n",
       ui: {
         menu_auto: "⚙️ 默认自动发送",
-        menu_lang: "⚙️ 设置选项及切换语言",
+        menu_lang: "⚙️ 设置面板",
         init: "环境初始化...",
         mode_direct: "🚀 直出模式 (自动发送)",
         mode_std: "🛡️ 标准模式 (仅填写)",
@@ -128,8 +141,20 @@
         unsaved_cancel: "取消",
         platform_section: "🤖 AI 平台选择",
         platform_at_least_one: "⚠️ 至少需要选择一个平台",
+        open_fg: "前台打开",
+        open_bg: "后台打开",
         btn_title: "点击：核查 ／ 长按 1 秒：强制自动发送",
         close_btn: "❌ 关闭",
+        tab_template: "模板",
+        tab_platform: "平台",
+        tab_language: "语言",
+        custom_lang_section: "✏️ 自定义语言",
+        custom_lang_loaded: "已加载：",
+        custom_lang_none: "尚未加载自定义语言。",
+        custom_lang_export: "📤 导出模板",
+        custom_lang_import: "📥 导入翻译",
+        custom_lang_clear_title: "移除自定义语言",
+        unsaved_footer_hint: "有未保存的更改",
       },
     },
     en: {
@@ -138,7 +163,7 @@
         "Please thoroughly fact-check the following post in English: analyze all claims for accuracy, flag errors, misleading statements, or out-of-context framing, and give a verdict (TRUE / PARTIALLY TRUE / FALSE / UNVERIFIABLE):\n",
       ui: {
         menu_auto: "⚙️ Auto Send",
-        menu_lang: "⚙️ Settings & Language",
+        menu_lang: "⚙️ Settings",
         init: "Initializing...",
         mode_direct: "🚀 Direct Mode (Auto Send)",
         mode_std: "🛡️ Standard Mode (Fill Only)",
@@ -172,8 +197,20 @@
         unsaved_cancel: "Cancel",
         platform_section: "🤖 AI Platform",
         platform_at_least_one: "⚠️ At least one platform must be selected",
+        open_fg: "Foreground",
+        open_bg: "Background",
         btn_title: "Click: Fact-check / Hold 1s: Force Auto-send",
         close_btn: "❌ Close",
+        tab_template: "Template",
+        tab_platform: "Platform",
+        tab_language: "Language",
+        custom_lang_section: "✏️ Custom Language",
+        custom_lang_loaded: "Loaded: ",
+        custom_lang_none: "No custom language loaded.",
+        custom_lang_export: "📤 Export Template",
+        custom_lang_import: "📥 Import Translation",
+        custom_lang_clear_title: "Remove custom language",
+        unsaved_footer_hint: "You have unsaved changes",
       },
     },
     ja: {
@@ -182,7 +219,7 @@
         "以下の投稿を日本語で詳しくファクトチェックしてください。すべての主張の正確性を分析し、誤り・誤解を招く情報・文脈の歪曲を指摘した上で、判定（事実／部分的に事実／不正確／検証不可）を示してください：\n",
       ui: {
         menu_auto: "⚙️ 自動送信",
-        menu_lang: "⚙️ 設定と言語切替",
+        menu_lang: "⚙️ 設定パネル",
         init: "初期化中...",
         mode_direct: "🚀 直接モード (自動送信)",
         mode_std: "🛡️ 標準モード (入力のみ)",
@@ -216,8 +253,20 @@
         unsaved_cancel: "キャンセル",
         platform_section: "🤖 AIプラットフォーム選択",
         platform_at_least_one: "⚠️ 少なくとも1つのプラットフォームを選択してください",
+        open_fg: "フォアグラウンド",
+        open_bg: "バックグラウンド",
         btn_title: "クリック：ファクトチェック ／ 長押し 1秒：強制自動送信",
         close_btn: "❌ 閉じる",
+        tab_template: "テンプレート",
+        tab_platform: "プラットフォーム",
+        tab_language: "言語",
+        custom_lang_section: "✏️ カスタム言語",
+        custom_lang_loaded: "読込済み：",
+        custom_lang_none: "カスタム言語は読み込まれていません。",
+        custom_lang_export: "📤 テンプレートを書き出す",
+        custom_lang_import: "📥 翻訳を読み込む",
+        custom_lang_clear_title: "カスタム言語を削除",
+        unsaved_footer_hint: "保存されていない変更があります",
       },
     },
     ko: {
@@ -226,7 +275,7 @@
         "다음 게시물을 한국어로 자세히 팩트체크해 주세요. 모든 주장의 사실 여부를 분석하고, 오류·오해의 소지가 있는 정보·맥락 왜곡을 지적한 후 판정(사실／부분적 사실／허위／확인 불가)을 내려 주세요：\n",
       ui: {
         menu_auto: "⚙️ 자동 전송",
-        menu_lang: "⚙️ 설정 및 언어 전환",
+        menu_lang: "⚙️ 설정 패널",
         init: "초기화 중...",
         mode_direct: "🚀 직접 모드 (자동 전송)",
         mode_std: "🛡️ 표준 모드 (입력만)",
@@ -260,8 +309,20 @@
         unsaved_cancel: "취소",
         platform_section: "🤖 AI 플랫폼 선택",
         platform_at_least_one: "⚠️ 최소 하나의 플랫폼을 선택해야 합니다",
+        open_fg: "포그라운드",
+        open_bg: "백그라운드",
         btn_title: "클릭: 팩트체크 / 1초 길게 누르기: 강제 자동 전송",
         close_btn: "❌ 닫기",
+        tab_template: "템플릿",
+        tab_platform: "플랫폼",
+        tab_language: "언어",
+        custom_lang_section: "✏️ 사용자 지정 언어",
+        custom_lang_loaded: "불러옴: ",
+        custom_lang_none: "불러온 사용자 지정 언어가 없습니다.",
+        custom_lang_export: "📤 템플릿 내보내기",
+        custom_lang_import: "📥 번역 가져오기",
+        custom_lang_clear_title: "사용자 지정 언어 삭제",
+        unsaved_footer_hint: "저장되지 않은 변경 사항이 있습니다",
       },
     },
     es: {
@@ -270,7 +331,7 @@
         "Por favor, verifica exhaustivamente la siguiente publicación en español: analiza la veracidad de todas las afirmaciones, señala errores, información engañosa o descontextualización, y emite un veredicto (VERDADERO / PARCIALMENTE VERDADERO / FALSO / NO VERIFICABLE):\n",
       ui: {
         menu_auto: "⚙️ Envío automático",
-        menu_lang: "⚙️ Configuración e idioma",
+        menu_lang: "⚙️ Panel de configuración",
         init: "Inicializando...",
         mode_direct: "🚀 Modo directo (Envío automático)",
         mode_std: "🛡️ Modo estándar (Solo rellenar)",
@@ -304,8 +365,20 @@
         unsaved_cancel: "Cancelar",
         platform_section: "🤖 Plataforma AI",
         platform_at_least_one: "⚠️ Se debe seleccionar al menos una plataforma",
+        open_fg: "Primer plano",
+        open_bg: "Segundo plano",
         btn_title: "Clic: Verificar / Mantener 1s: Envío automático forzado",
         close_btn: "❌ Cerrar",
+        tab_template: "Plantilla",
+        tab_platform: "Plataforma",
+        tab_language: "Idioma",
+        custom_lang_section: "✏️ Idioma personalizado",
+        custom_lang_loaded: "Cargado: ",
+        custom_lang_none: "No hay ningún idioma personalizado cargado.",
+        custom_lang_export: "📤 Exportar plantilla",
+        custom_lang_import: "📥 Importar traducción",
+        custom_lang_clear_title: "Quitar idioma personalizado",
+        unsaved_footer_hint: "Hay cambios sin guardar",
       },
     },
     "pt-BR": {
@@ -314,7 +387,7 @@
         "Por favor, verifique detalhadamente os fatos da seguinte publicação em português: analise a veracidade de todas as afirmações, sinalize erros, informações enganosas ou contexto distorcido, e emita um veredicto (VERDADEIRO / PARCIALMENTE VERDADEIRO / FALSO / NÃO VERIFICÁVEL):\n",
       ui: {
         menu_auto: "⚙️ Envio automático",
-        menu_lang: "⚙️ Configurações e idioma",
+        menu_lang: "⚙️ Painel de configurações",
         init: "Inicializando...",
         mode_direct: "🚀 Modo direto (Envio automático)",
         mode_std: "🛡️ Modo padrão (Apenas preencher)",
@@ -348,8 +421,20 @@
         unsaved_cancel: "Cancelar",
         platform_section: "🤖 Plataforma AI",
         platform_at_least_one: "⚠️ Pelo menos uma plataforma deve ser selecionada",
+        open_fg: "Primeiro plano",
+        open_bg: "Segundo plano",
         btn_title: "Clique: Verificar / Segurar 1s: Envio automático forçado",
         close_btn: "❌ Fechar",
+        tab_template: "Modelo",
+        tab_platform: "Plataforma",
+        tab_language: "Idioma",
+        custom_lang_section: "✏️ Idioma personalizado",
+        custom_lang_loaded: "Carregado: ",
+        custom_lang_none: "Nenhum idioma personalizado carregado.",
+        custom_lang_export: "📤 Exportar modelo",
+        custom_lang_import: "📥 Importar tradução",
+        custom_lang_clear_title: "Remover idioma personalizado",
+        unsaved_footer_hint: "Há alterações não salvas",
       },
     },
     fr: {
@@ -358,7 +443,7 @@
         "Veuillez vérifier en détail les informations de la publication suivante en français : analysez la véracité de toutes les affirmations, signalez les erreurs, informations trompeuses ou éléments sortis de leur contexte, et donnez un verdict (VRAI / PARTIELLEMENT VRAI / FAUX / NON VÉRIFIABLE) :\n",
       ui: {
         menu_auto: "⚙️ Envoi automatique",
-        menu_lang: "⚙️ Paramètres et langue",
+        menu_lang: "⚙️ Panneau de configuration",
         init: "Initialisation...",
         mode_direct: "🚀 Mode direct (Envoi automatique)",
         mode_std: "🛡️ Mode standard (Remplir seulement)",
@@ -392,8 +477,20 @@
         unsaved_cancel: "Annuler",
         platform_section: "🤖 Plateforme AI",
         platform_at_least_one: "⚠️ Au moins une plateforme doit être sélectionnée",
+        open_fg: "Premier plan",
+        open_bg: "Arrière-plan",
         btn_title: "Clic : Vérifier / Maintenir 1s : Envoi automatique forcé",
         close_btn: "❌ Fermer",
+        tab_template: "Modèle",
+        tab_platform: "Plateforme",
+        tab_language: "Langue",
+        custom_lang_section: "✏️ Langue personnalisée",
+        custom_lang_loaded: "Chargé : ",
+        custom_lang_none: "Aucune langue personnalisée chargée.",
+        custom_lang_export: "📤 Exporter le modèle",
+        custom_lang_import: "📥 Importer la traduction",
+        custom_lang_clear_title: "Supprimer la langue personnalisée",
+        unsaved_footer_hint: "Des modifications non enregistrées existent",
       },
     },
   };
@@ -472,6 +569,8 @@
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z" /><path d="M9.5 9h5" /><path d="M9.5 13h3.5" /></svg>',
     GEMINI:
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C11.45 8.05 8.05 11.45 2 12C8.05 12.55 11.45 15.95 12 22C12.55 15.95 15.95 12.55 22 12C15.95 11.45 12.55 8.05 12 2Z"/></svg>',
+    META:
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 8.5C4 8.5 2.5 10.5 2.5 12.5S4 16.5 6.5 16.5c2.8 0 4-2 5.5-4.5m0 0c1.5-2.5 2.7-4.5 5.5-4.5 2.5 0 4 2 4 4.5s-1.5 4.5-4 4.5c-2.8 0-4-2-5.5-4.5"/></svg>',
   };
   ICONS.GROK = ICONS.ROBOT;
 
@@ -479,9 +578,13 @@
     { key: "grok",    name: "Grok",    color: "#1d9bf0" },
     { key: "chatgpt", name: "ChatGPT", color: "#10a37f" },
     { key: "gemini",  name: "Gemini",  color: "#8b5cf6" },
+    { key: "meta",    name: "Meta AI (需登入 FB/IG)", color: "#0866ff" },
   ];
 
   function registerMenus() {
+    GM_registerMenuCommand(LangSystem.getText("menu_lang"), () => {
+      showLanguageSelectionUI();
+    });
     const isAutoSend = GM_getValue("cfg_auto_send", false);
     const autoSendText = isAutoSend ? "✅ ON" : "❌ OFF";
     GM_registerMenuCommand(
@@ -491,9 +594,6 @@
         location.reload();
       },
     );
-    GM_registerMenuCommand(LangSystem.getText("menu_lang"), () => {
-      showLanguageSelectionUI();
-    });
   }
 
   const style = document.createElement("style");
@@ -526,10 +626,12 @@
 
         .grok-lang-panel {
             background: #16181c; border: 1px solid #2f3336; border-radius: 16px;
-            padding: 20px; width: 300px; display: flex; flex-direction: column; gap: 12px;
+            padding: 0; width: 510px; height: 710px; max-width: 94vw; max-height: 94vh;
+            display: flex; flex-direction: column;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            overflow: hidden; transform: translateZ(0);
         }
-        .grok-lang-title { color: #e7e9ea; font-size: 18px; font-weight: bold; text-align: center; margin-bottom: 8px; }
+        .grok-lang-title { color: #e7e9ea; font-size: 16px; font-weight: 700; margin: 0; }
         .grok-lang-btn {
             background: transparent; border: 1px solid #536471; color: #e7e9ea;
             padding: 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 14px;
@@ -538,11 +640,6 @@
         .grok-lang-btn:hover { background: rgba(29, 155, 240, 0.1); border-color: #1d9bf0; color: #1d9bf0; }
         .grok-lang-btn.active { background: #1d9bf0; border-color: #1d9bf0; color: white; }
 
-        .grok-settings-divider { border: none; border-top: 1px solid #2f3336; margin: 8px 0; }
-        .grok-settings-section-label {
-            color: #8899a6; font-size: 12px; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.8px; padding: 4px 0 6px; margin-top: 4px;
-        }
         .grok-custom-checkbox-row {
             display: flex; align-items: center; gap: 10px; cursor: pointer;
             color: #e7e9ea; font-size: 13px; user-select: none; padding: 6px 0;
@@ -566,16 +663,112 @@
         }
         .grok-save-btn:hover { background: #1a8cd8; }
         .grok-save-btn.saved { background: #00ba7c; }
-        .grok-lang-panel { max-height: 90vh; overflow-y: auto; overflow-x: visible; transform: translateZ(0); }
+        .grok-save-btn:disabled { background: #2f3336; color: #536471; cursor: not-allowed; }
 
-        .grok-lang-list {
-            max-height: 220px; overflow-y: auto; overflow-x: hidden;
-            -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 12px;
-            margin: 0 -2px; padding: 2px;
+        .gfc-panel-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px 12px; flex-shrink: 0; border-bottom: 1px solid #2f3336;
         }
-        .grok-lang-list::-webkit-scrollbar { width: 4px; }
-        .grok-lang-list::-webkit-scrollbar-track { background: transparent; }
-        .grok-lang-list::-webkit-scrollbar-thumb { background: #536471; border-radius: 2px; }
+        .gfc-panel-close {
+            background: transparent; border: none; color: #8899a6; cursor: pointer;
+            width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; transition: all 0.15s; flex-shrink: 0; font-size: 16px; padding: 0;
+        }
+        .gfc-panel-close:hover { background: rgba(244, 33, 46, 0.12); color: #f4212e; }
+
+        .gfc-tab-bar {
+            display: flex; gap: 4px; padding: 8px 12px 0; flex-shrink: 0;
+        }
+        .gfc-tab-btn {
+            flex: 1; background: transparent; border: none; color: #8899a6;
+            padding: 10px 8px 12px; font-size: 13px; font-weight: 600; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
+        }
+        .gfc-tab-btn span.gfc-tab-icon { font-size: 16px; line-height: 1; }
+        .gfc-tab-btn:hover { color: #e7e9ea; }
+        .gfc-tab-btn.active { color: #1d9bf0; border-bottom-color: #1d9bf0; }
+
+        .gfc-tab-body {
+            padding: 16px 20px 20px; overflow-y: auto; overflow-x: hidden;
+            display: flex; flex-direction: column; gap: 14px; flex: 1;
+        }
+        .gfc-tab-body::-webkit-scrollbar { width: 5px; }
+        .gfc-tab-body::-webkit-scrollbar-track { background: transparent; }
+        .gfc-tab-body::-webkit-scrollbar-thumb { background: #536471; border-radius: 3px; }
+        .gfc-tab-pane { display: none; flex-direction: column; gap: 14px; }
+        .gfc-tab-pane.active {
+            display: flex;
+            animation: gfc-pane-fade-in 0.22s ease-out;
+        }
+        @keyframes gfc-pane-fade-in {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .gfc-card {
+            background: #1c1f23; border: 1px solid #2f3336; border-radius: 12px;
+            padding: 14px; display: flex; flex-direction: column; gap: 10px;
+        }
+        .gfc-card-title {
+            display: flex; align-items: center; gap: 8px; color: #e7e9ea;
+            font-size: 13px; font-weight: 700;
+        }
+        .gfc-card-hint { color: #8899a6; font-size: 11px; line-height: 1.6; }
+
+        .gfc-collapse {
+            overflow: hidden; max-height: 0; opacity: 0; margin-top: 0;
+            transition: max-height 0.25s ease, opacity 0.2s ease, margin-top 0.25s ease;
+        }
+        .gfc-collapse.open { max-height: 240px; opacity: 1; margin-top: 4px; }
+
+        .gfc-plat-row {
+            display: flex; align-items: center; gap: 10px; padding: 8px 4px;
+            border-radius: 8px; transition: background 0.12s, opacity 0.25s ease, filter 0.25s ease;
+        }
+        .gfc-plat-row:hover { background: rgba(255,255,255,0.04); }
+        .gfc-plat-row input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
+        .gfc-plat-row-name { flex: 1; }
+        .gfc-plat-open-select {
+            background: #16181c; border: 1px solid #2f3336; color: #e7e9ea;
+            font-size: 12px; padding: 5px 8px; border-radius: 6px; cursor: pointer;
+            flex-shrink: 0; transition: border-color 0.15s;
+        }
+        .gfc-plat-open-select:hover { border-color: #536471; }
+        .gfc-plat-open-select:focus { outline: none; border-color: #1d9bf0; }
+
+        .gfc-tab-btn { position: relative; }
+        .gfc-new-badge {
+            position: absolute; top: 2px; right: 4px; width: 8px; height: 8px;
+            border-radius: 50%; background: #f4212e; pointer-events: none;
+            animation: gfc-new-pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes gfc-new-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(244,33,46,0.5); }
+            50%      { box-shadow: 0 0 0 4px rgba(244,33,46,0); }
+        }
+
+        .gfc-lang-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+        }
+        .gfc-lang-cell {
+            background: transparent; border: 1px solid #536471; color: #e7e9ea;
+            padding: 10px 8px; border-radius: 8px; cursor: pointer; transition: all 0.15s;
+            font-size: 13px; text-align: left; line-height: 1.3;
+        }
+        .gfc-lang-cell:hover { border-color: #1d9bf0; color: #1d9bf0; background: rgba(29,155,240,0.08); }
+        .gfc-lang-cell.selected { background: #1d9bf0; border-color: #1d9bf0; color: white; }
+
+        .gfc-panel-footer {
+            padding: 12px 20px; border-top: 1px solid #2f3336; flex-shrink: 0;
+            display: flex; gap: 10px; align-items: center;
+        }
+        .gfc-unsaved-dot {
+            width: 8px; height: 8px; border-radius: 50%; background: #ffd400; flex-shrink: 0;
+            opacity: 0; transform: scale(0.4);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .gfc-unsaved-dot.visible { opacity: 1; transform: scale(1); }
 
         .gfc-plat-drop {
             background: #16181c; border: 1px solid #2f3336; border-radius: 12px;
@@ -587,20 +780,6 @@
         @keyframes gfc-drop-in {
             from { opacity: 0; transform: translateY(6px) translateZ(0); }
             to   { opacity: 1; transform: translateY(0)   translateZ(0); }
-        }
-        
-        .gfc-lang-toast {
-            position: fixed; top: 24px; left: 50%;
-            transform: translateX(-50%) translateY(-10px);
-            background: #16181c; border: 1px solid #00ba7c;
-            color: #00ba7c; padding: 8px 22px; border-radius: 20px;
-            font-size: 13px; font-weight: 600; white-space: nowrap;
-            opacity: 0; pointer-events: none; z-index: 2147483647;
-            transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-        .gfc-lang-toast--visible {
-            opacity: 1; transform: translateX(-50%) translateY(0);
         }
         .gfc-plat-item {
             display: flex; align-items: center; gap: 10px;
@@ -617,7 +796,11 @@
             position: absolute; inset: 0; background: rgba(0,0,0,0.75);
             border-radius: 16px; display: flex; flex-direction: column;
             align-items: center; justify-content: center; gap: 12px; padding: 24px;
-            z-index: 10;
+            z-index: 10; animation: gfc-dialog-fade-in 0.18s ease-out;
+        }
+        @keyframes gfc-dialog-fade-in {
+            from { opacity: 0; transform: scale(0.97); }
+            to   { opacity: 1; transform: scale(1); }
         }
         .grok-unsaved-title {
             color: #e7e9ea; font-size: 15px; font-weight: 600; text-align: center;
@@ -630,6 +813,8 @@
         .grok-unsaved-btn.primary { background: #1d9bf0; color: white; }
         .grok-unsaved-btn.danger  { background: transparent; color: #f4212e; border: 1px solid #f4212e; }
         .grok-unsaved-btn.ghost   { background: transparent; color: #8899a6; border: 1px solid #536471; }
+        .grok-unsaved-row { display: flex; gap: 10px; width: 100%; }
+        .grok-unsaved-row .grok-unsaved-btn { width: auto; flex: 1; }
 
         .grok-sidebar-toggle {
             position: fixed; bottom: 20px; left: 20px; width: 40px; height: 40px;
@@ -748,7 +933,7 @@
     }
   }
 
-  function showLanguageSelectionUI() {
+  function showLanguageSelectionUI(initialTab = "template") {
     if (document.querySelector(".grok-curtain-overlay")) {
       const existing = document.querySelector(".grok-curtain-overlay");
       existing.parentNode.removeChild(existing);
@@ -757,18 +942,79 @@
     overlay.className = "grok-curtain-overlay";
     const panel = document.createElement("div");
     panel.className = "grok-lang-panel";
-    panel.style.width = "460px";
     panel.style.position = "relative";
 
+    const header = document.createElement("div");
+    header.className = "gfc-panel-header";
     const title = document.createElement("div");
     title.className = "grok-lang-title";
     title.innerText = LangSystem.getText("settings_title");
-    panel.appendChild(title);
+    header.appendChild(title);
+    const headerCloseBtn = document.createElement("button");
+    headerCloseBtn.className = "gfc-panel-close";
+    headerCloseBtn.innerHTML = "✕";
+    headerCloseBtn.title = LangSystem.getText("close_btn");
+    header.appendChild(headerCloseBtn);
+    panel.appendChild(header);
+
+    const TABS = [
+      { key: "template", icon: "🤖", labelKey: "tab_template" },
+      { key: "platform",  icon: "🌐", labelKey: "tab_platform" },
+      { key: "language",  icon: "🔤", labelKey: "tab_language" },
+    ];
+    const tabBar = document.createElement("div");
+    tabBar.className = "gfc-tab-bar";
+    const tabBtns = {};
+    TABS.forEach(({ key, icon, labelKey }) => {
+      const tabBtn = document.createElement("button");
+      tabBtn.className = "gfc-tab-btn";
+      if (key === initialTab) tabBtn.classList.add("active");
+      tabBtn.innerHTML = `<span class="gfc-tab-icon">${icon}</span><span>${LangSystem.getText(labelKey)}</span>`;
+      if (key === "platform" && isFeatureNew("open_behavior")) {
+        const badge = document.createElement("span");
+        badge.className = "gfc-new-badge";
+        tabBtn.appendChild(badge);
+      }
+      tabBtn.onclick = () => switchTab(key);
+      tabBar.appendChild(tabBtn);
+      tabBtns[key] = tabBtn;
+    });
+    panel.appendChild(tabBar);
+
+    const tabBody = document.createElement("div");
+    tabBody.className = "gfc-tab-body";
+    const tabPanes = {};
+    TABS.forEach(({ key }) => {
+      const pane = document.createElement("div");
+      pane.className = "gfc-tab-pane";
+      if (key === initialTab) pane.classList.add("active");
+      tabBody.appendChild(pane);
+      tabPanes[key] = pane;
+    });
+    panel.appendChild(tabBody);
+
+    let currentTab = initialTab;
+    function switchTab(key) {
+      currentTab = key;
+      Object.entries(tabBtns).forEach(([k, el]) => el.classList.toggle("active", k === key));
+      Object.entries(tabPanes).forEach(([k, el]) => el.classList.toggle("active", k === key));
+      if (key === "platform" && isFeatureNew("open_behavior")) {
+        markFeatureSeen("open_behavior");
+        tabBtns.platform.querySelector(".gfc-new-badge")?.remove();
+      }
+    }
+    if (initialTab === "platform" && isFeatureNew("open_behavior")) {
+      markFeatureSeen("open_behavior");
+      tabBtns.platform.querySelector(".gfc-new-badge")?.remove();
+    }
+
+    const templateCard = document.createElement("div");
+    templateCard.className = "gfc-card";
 
     const customLabel = document.createElement("div");
-    customLabel.className = "grok-settings-section-label";
+    customLabel.className = "gfc-card-title";
     customLabel.innerText = LangSystem.getText("custom_prompt_section");
-    panel.appendChild(customLabel);
+    templateCard.appendChild(customLabel);
 
     const checkRow = document.createElement("label");
     checkRow.className = "grok-custom-checkbox-row";
@@ -779,25 +1025,31 @@
     checkLabel.innerText = LangSystem.getText("custom_prompt_checkbox");
     checkRow.appendChild(checkbox);
     checkRow.appendChild(checkLabel);
-    panel.appendChild(checkRow);
+    templateCard.appendChild(checkRow);
 
+    const textareaWrap = document.createElement("div");
+    textareaWrap.className = "gfc-collapse" + (checkbox.checked ? " open" : "");
     const textarea = document.createElement("textarea");
     textarea.className = "grok-custom-textarea";
     textarea.placeholder = LangSystem.getText("custom_prompt_placeholder");
     textarea.value = GM_getValue("cfg_custom_prompt", "");
-    textarea.style.display = checkbox.checked ? "block" : "none";
     textarea.style.height = "88px";
     textarea.style.minHeight = "88px";
     textarea.style.resize = "none";
-    panel.appendChild(textarea);
+    textareaWrap.appendChild(textarea);
+    templateCard.appendChild(textareaWrap);
 
     checkbox.addEventListener("change", () => {
-      textarea.style.display = checkbox.checked ? "block" : "none";
+      textareaWrap.classList.toggle("open", checkbox.checked);
+      refreshFooterState();
     });
 
+    tabPanes.template.appendChild(templateCard);
+
+    const highlightCard = document.createElement("div");
+    highlightCard.className = "gfc-card";
     const highlightRow = document.createElement("label");
     highlightRow.className = "grok-custom-checkbox-row";
-    highlightRow.style.marginTop = "6px";
     const highlightChk = document.createElement("input");
     highlightChk.type = "checkbox";
     highlightChk.checked = GM_getValue("cfg_highlight_url", false);
@@ -805,152 +1057,106 @@
     highlightLabel.innerText = LangSystem.getText("highlight_url_checkbox");
     highlightRow.appendChild(highlightChk);
     highlightRow.appendChild(highlightLabel);
-    panel.appendChild(highlightRow);
+    highlightCard.appendChild(highlightRow);
 
     const highlightNote = document.createElement("div");
-    highlightNote.style.cssText = "font-size:11px;color:#8899a6;padding:2px 0 0 26px;line-height:1.5;";
-    highlightNote.innerText = "⚠️ Grok only — ChatGPT uses a rich-text editor that does not support text selection via script.";
+    highlightNote.className = "gfc-card-hint gfc-collapse";
+    highlightNote.style.paddingLeft = "26px";
+    highlightNote.innerText = "⚠️ Highlighting on non-Grok platforms (ChatGPT/Gemini/Meta AI) works, but accuracy may still vary by site.";
     function updateHighlightNote() {
-      const enabled = getEnabledPlatforms();
-      highlightNote.style.display = enabled.includes("chatgpt") ? "block" : "none";
+      const checkedKeys = Object.entries(platformCheckboxes)
+        .filter(([, c]) => c.checked).map(([k]) => k);
+      highlightNote.classList.toggle("open", checkedKeys.some(k => k !== "grok"));
     }
-    updateHighlightNote();
-    panel.appendChild(highlightNote);
+    highlightCard.appendChild(highlightNote);
+    highlightChk.addEventListener("change", refreshFooterState);
+    tabPanes.template.appendChild(highlightCard);
 
+    const platformCard = document.createElement("div");
+    platformCard.className = "gfc-card";
     const platformLabel = document.createElement("div");
-    platformLabel.className = "grok-settings-section-label";
-    platformLabel.style.marginTop = "6px";
+    platformLabel.className = "gfc-card-title";
     platformLabel.innerText = LangSystem.getText("platform_section");
-    panel.appendChild(platformLabel);
+    platformCard.appendChild(platformLabel);
 
     const enabledPlatformsInit = getEnabledPlatforms();
     const platformCheckboxes = {};
+    const platformOpenSelects = {};
     const PLAT_COLORS = Object.fromEntries(PLATFORM_DEFS.map(p => [p.key, p.color]));
-
-    const EXPERIMENTAL_WARN_MSG = {
-      chatgpt: {
-        "zh-TW": "⚠️ ChatGPT 目前為實驗性支援\n\nChatGPT 無法直接解析貼文網址，腳本會改將貼文內文填入查核指令。若無法擷取內文，將自動 fallback 到網址。\n\n確定要開啟 ChatGPT 選項嗎？",
-        "zh-CN": "⚠️ ChatGPT 目前为实验性支持\n\nChatGPT 无法直接解析帖子链接，脚本会将帖子内文填入查核指令。若无法提取内文，将自动 fallback 到链接。\n\n确定要开启 ChatGPT 选项吗？",
-        "ja":    "⚠️ ChatGPT は現在実験的なサポートです\n\nChatGPT は投稿 URL を直接解析できないため、スクリプトが投稿本文をプロンプトに挿入します。本文が取得できない場合は URL にフォールバックします。\n\nChatGPT を有効にしますか？",
-        "ko":    "⚠️ ChatGPT는 현재 실험적으로 지원됩니다\n\nChatGPT는 게시물 URL을 직접 분석할 수 없어 스크립트가 게시물 본문을 프롬프트에 삽입합니다. 본문을 가져올 수 없으면 URL로 폴백됩니다.\n\nChatGPT를 활성화하시겠습니까?",
-        "en":    "⚠️ ChatGPT is currently experimental\n\nChatGPT cannot parse post URLs directly. The script will insert the post content into the prompt instead. If content cannot be extracted, it will fall back to the URL.\n\nEnable ChatGPT anyway?",
-        "es":    "⚠️ ChatGPT es actualmente experimental\n\nChatGPT no puede analizar URLs de publicaciones directamente. El script insertará el contenido de la publicación en el prompt. Si no se puede extraer el contenido, se usará la URL.\n\n¿Activar ChatGPT de todas formas?",
-        "pt-BR": "⚠️ ChatGPT é experimental no momento\n\nO ChatGPT não consegue analisar URLs de publicações diretamente. O script inserirá o conteúdo da publicação no prompt. Se não for possível extrair o conteúdo, usará a URL.\n\nAtivar ChatGPT mesmo assim?",
-        "fr":    "⚠️ ChatGPT est actuellement expérimental\n\nChatGPT ne peut pas analyser directement les URL de publications. Le script insérera le contenu de la publication dans le prompt. Si le contenu ne peut pas être extrait, l'URL sera utilisée.\n\nActiver ChatGPT quand même ?",
-      },
-      gemini: {
-        "zh-TW": "⚠️ Gemini 目前不支援模版自動填入功能\n\n跳轉後需手動貼上內容，且無法自動切換暫時聊天模式。\n\n確定要強制開啟 Gemini 選項嗎？",
-        "zh-CN": "⚠️ Gemini 目前不支持模板自动填入功能\n\n跳转后需手动粘贴内容，且无法自动切换临时聊天模式。\n\n确定要强制开启 Gemini 选项吗？",
-        "ja":    "⚠️ Gemini は現在テンプレートの自動入力に対応していません\n\n開いた後は手動でテキストを貼り付けてください。一時チャットへの自動切替もできません。\n\nGemini を強制的に有効にしますか？",
-        "ko":    "⚠️ Gemini는 현재 템플릿 자동 입력을 지원하지 않습니다\n\n열린 후 수동으로 내용을 붙여넣으세요. 임시 채팅 자동 전환도 불가합니다.\n\nGemini를 강제로 활성화하시겠습니까?",
-        "en":    "⚠️ Gemini does not currently support auto-fill templates.\n\nYou will need to paste the content manually after opening. Automatic Temporary Chat switching is also unavailable.\n\nForce-enable Gemini anyway?",
-        "es":    "⚠️ Gemini no admite actualmente el relleno automático de plantillas.\n\nDeberás pegar el contenido manualmente. El cambio automático al chat temporal tampoco está disponible.\n\n¿Forzar la activación de Gemini?",
-        "pt-BR": "⚠️ O Gemini não suporta preenchimento automático de modelos no momento.\n\nVocê precisará colar o conteúdo manualmente. A troca automática para chat temporário também não está disponível.\n\nForçar ativação do Gemini mesmo assim?",
-        "fr":    "⚠️ Gemini ne prend pas en charge le remplissage automatique des modèles pour le moment.\n\nVous devrez coller le contenu manuellement. La bascule automatique vers le chat temporaire n'est pas disponible non plus.\n\nForcer l'activation de Gemini quand même ?",
-      },
-    };
-
-    const EXPERIMENTAL_KEYS = new Set(["chatgpt", "gemini"]);
 
     PLATFORM_DEFS.forEach(({ key, name }) => {
       const row = document.createElement("label");
-      row.className = "grok-custom-checkbox-row";
+      row.className = "gfc-plat-row";
       const chk = document.createElement("input");
       chk.type = "checkbox";
       chk.checked = enabledPlatformsInit.includes(key);
       chk.style.accentColor = PLAT_COLORS[key];
-
-      if (EXPERIMENTAL_KEYS.has(key)) {
-        row.style.opacity = chk.checked ? "1" : "0.4";
-        row.style.filter  = chk.checked ? "none" : "grayscale(0.6)";
-        chk.addEventListener("change", () => {
-          if (chk.checked) {
-            const langCode = LangSystem.getKey() || "en";
-            const msgMap = EXPERIMENTAL_WARN_MSG[key];
-            const msg = msgMap[langCode] || msgMap["en"];
-            if (!confirm(msg)) {
-              chk.checked = false;
-              row.style.opacity = "0.4";
-              row.style.filter  = "grayscale(0.6)";
-            } else {
-              row.style.opacity = "1";
-              row.style.filter  = "none";
-            }
-          } else {
-            row.style.opacity = "0.4";
-            row.style.filter  = "grayscale(0.6)";
-          }
-        });
-      }
 
       const iconEl = document.createElement("span");
       iconEl.style.cssText = `width:16px;height:16px;display:inline-flex;align-items:center;flex-shrink:0;color:${PLAT_COLORS[key]};`;
       iconEl.innerHTML = getPlatformIcon(key);
 
       const nameEl = document.createElement("span");
-      if (EXPERIMENTAL_KEYS.has(key)) {
-        nameEl.innerHTML = `${name} <span style="color:#f4212e;font-size:11px;font-weight:600;">(⚠️ Experimental)</span>`;
-      } else {
-        nameEl.innerText = name;
-      }
+      nameEl.innerText = name;
 
       const wrapper = document.createElement("span");
+      wrapper.className = "gfc-plat-row-name";
       wrapper.style.cssText = "display:inline-flex;align-items:center;gap:6px;";
       wrapper.appendChild(iconEl);
       wrapper.appendChild(nameEl);
 
+      const openSelect = document.createElement("select");
+      openSelect.className = "gfc-plat-open-select";
+      const optFg = document.createElement("option");
+      optFg.value = "fg";
+      optFg.innerText = LangSystem.getText("open_fg");
+      const optBg = document.createElement("option");
+      optBg.value = "bg";
+      optBg.innerText = LangSystem.getText("open_bg");
+      openSelect.appendChild(optFg);
+      openSelect.appendChild(optBg);
+      openSelect.value = getOpenBehavior(key) ? "fg" : "bg";
+      openSelect.addEventListener("click", (e) => e.stopPropagation());
+      openSelect.addEventListener("change", (e) => {
+        e.stopPropagation();
+        refreshFooterState();
+      });
+
       row.appendChild(chk);
       row.appendChild(wrapper);
-      panel.appendChild(row);
+      row.appendChild(openSelect);
+      platformCard.appendChild(row);
       platformCheckboxes[key] = chk;
+      platformOpenSelects[key] = openSelect;
     });
 
     const platformWarn = document.createElement("div");
-    platformWarn.style.cssText = "color:#f4212e;font-size:12px;display:none;padding:4px 0;";
+    platformWarn.className = "gfc-collapse";
+    platformWarn.style.cssText = "color:#f4212e;font-size:12px;";
     platformWarn.innerText = LangSystem.getText("platform_at_least_one");
-    panel.appendChild(platformWarn);
+    platformCard.appendChild(platformWarn);
 
     Object.values(platformCheckboxes).forEach(chk => {
       chk.addEventListener("change", () => {
         const anyChecked = Object.values(platformCheckboxes).some(c => c.checked);
-        platformWarn.style.display = anyChecked ? "none" : "block";
-        const checkedKeys = Object.entries(platformCheckboxes)
-          .filter(([, c]) => c.checked).map(([k]) => k);
-        highlightNote.style.display = checkedKeys.includes("chatgpt") ? "block" : "none";
+        platformWarn.classList.toggle("open", !anyChecked);
+        updateHighlightNote();
+        refreshFooterState();
       });
     });
+    updateHighlightNote();
 
-    const saveBtn = document.createElement("button");
-    saveBtn.className = "grok-save-btn";
-    saveBtn.innerText = LangSystem.getText("custom_prompt_save");
-    saveBtn.onclick = () => {
-      doSave();
-      initialState.enabled   = checkbox.checked;
-      initialState.prompt    = textarea.value.trim();
-      initialState.highlight = highlightChk.checked;
-      initialState.platforms = JSON.stringify(
-        PLATFORM_DEFS.map(p => p.key).filter(k => platformCheckboxes[k]?.checked)
-      );
-      saveBtn.innerText = LangSystem.getText("custom_prompt_saved");
-      saveBtn.classList.add("saved");
-      setTimeout(() => {
-        saveBtn.innerText = LangSystem.getText("custom_prompt_save");
-        saveBtn.classList.remove("saved");
-      }, 2000);
-    };
-    panel.appendChild(saveBtn);
+    tabPanes.platform.appendChild(platformCard);
 
-    const divider = document.createElement("hr");
-    divider.className = "grok-settings-divider";
-    panel.appendChild(divider);
-
+    const langCard = document.createElement("div");
+    langCard.className = "gfc-card";
     const langLabel = document.createElement("div");
-    langLabel.className = "grok-settings-section-label";
+    langLabel.className = "gfc-card-title";
     langLabel.innerText = LangSystem.getText("lang_section_title");
-    panel.appendChild(langLabel);
+    langCard.appendChild(langLabel);
 
     const currentCode = GM_getValue("cfg_lang_code", null);
-    const activeLangCode = currentCode || (() => {
+    const initialLangCode = currentCode || (() => {
       const navLang = navigator.language.toLowerCase();
       if (navLang.includes("zh-hant") || navLang.includes("zh-tw") || navLang.includes("zh-hk")) return "zh-TW";
       if (navLang.includes("zh-hans") || navLang.includes("zh-cn") || navLang.includes("zh")) return "zh-CN";
@@ -961,55 +1167,56 @@
       if (navLang.includes("es")) return "es";
       return "en";
     })();
-    const langList = document.createElement("div");
-    langList.className = "grok-lang-list";
+    let selectedLangCode = initialLangCode;
+    const langGrid = document.createElement("div");
+    langGrid.className = "gfc-lang-grid";
+    const langCells = {};
     Object.keys(LANG_DICT).forEach((code) => {
-      const btn = document.createElement("button");
-      btn.className = "grok-lang-btn";
-      if (code === activeLangCode) btn.classList.add("active");
-      btn.innerText = LANG_DICT[code].name;
-      btn.onclick = () => {
-        LangSystem.setKey(code);
-        document.querySelectorAll(".my-grok-robot-btn").forEach(b => {
-          b.title = LangSystem.getText("btn_title");
-        });
-        if (hasUnsavedChanges()) doSave();
-        doClose();
-        setTimeout(() => {
-          showLanguageSelectionUI();
-          const toast = document.createElement("div");
-          toast.className = "gfc-lang-toast";
-          toast.textContent = "✓  " + (LANG_DICT[code]?.name || code);
-          document.body.appendChild(toast);
-          requestAnimationFrame(() => toast.classList.add("gfc-lang-toast--visible"));
-          setTimeout(() => {
-            toast.classList.remove("gfc-lang-toast--visible");
-            setTimeout(() => toast.remove(), 300);
-          }, 2200);
-        }, 360);
+      const cell = document.createElement("button");
+      cell.className = "gfc-lang-cell";
+      if (code === selectedLangCode) cell.classList.add("selected");
+      cell.innerText = LANG_DICT[code].name;
+      cell.onclick = () => {
+        selectedLangCode = code;
+        Object.entries(langCells).forEach(([c, el]) => el.classList.toggle("selected", c === code));
+        refreshFooterState();
       };
-      langList.appendChild(btn);
+      langGrid.appendChild(cell);
+      langCells[code] = cell;
     });
-    panel.appendChild(langList);
+    langCard.appendChild(langGrid);
+    tabPanes.language.appendChild(langCard);
 
-    buildCustomLangSection(panel);
+    const customLangCard = document.createElement("div");
+    customLangCard.className = "gfc-card";
+    buildCustomLangSection(customLangCard);
+    tabPanes.language.appendChild(customLangCard);
 
     const initialState = {
       enabled:   GM_getValue("cfg_custom_prompt_enabled", false),
       prompt:    GM_getValue("cfg_custom_prompt", "").trim(),
       highlight: GM_getValue("cfg_highlight_url", false),
       platforms: GM_getValue("cfg_platforms", '["grok"]'),
+      langCode:  initialLangCode,
+      openBehavior: JSON.stringify(
+        Object.fromEntries(PLATFORM_DEFS.map(p => [p.key, getOpenBehavior(p.key)]))
+      ),
     };
 
     function hasUnsavedChanges() {
       const currentPlatforms = JSON.stringify(
         PLATFORM_DEFS.map(p => p.key).filter(k => platformCheckboxes[k]?.checked)
       );
+      const currentOpenBehavior = JSON.stringify(
+        Object.fromEntries(PLATFORM_DEFS.map(p => [p.key, platformOpenSelects[p.key]?.value === "fg"]))
+      );
       return (
-        checkbox.checked      !== initialState.enabled   ||
-        textarea.value.trim() !== initialState.prompt    ||
-        highlightChk.checked  !== initialState.highlight ||
-        currentPlatforms      !== initialState.platforms
+        checkbox.checked      !== initialState.enabled      ||
+        textarea.value.trim() !== initialState.prompt       ||
+        highlightChk.checked  !== initialState.highlight    ||
+        currentPlatforms      !== initialState.platforms    ||
+        selectedLangCode      !== initialState.langCode     ||
+        currentOpenBehavior   !== initialState.openBehavior
       );
     }
 
@@ -1021,6 +1228,28 @@
       GM_setValue("cfg_custom_prompt_enabled", checkbox.checked);
       GM_setValue("cfg_custom_prompt", textarea.value.trim());
       GM_setValue("cfg_highlight_url", highlightChk.checked);
+      GM_setValue("cfg_open_behavior", JSON.stringify(
+        Object.fromEntries(PLATFORM_DEFS.map(p => [p.key, platformOpenSelects[p.key]?.value === "fg"]))
+      ));
+
+      const langChanged = selectedLangCode !== initialState.langCode;
+      if (langChanged) {
+        LangSystem.setKey(selectedLangCode);
+        document.querySelectorAll(".my-grok-robot-btn").forEach(b => {
+          b.title = LangSystem.getText("btn_title");
+        });
+      }
+
+      initialState.enabled      = checkbox.checked;
+      initialState.prompt       = textarea.value.trim();
+      initialState.highlight    = highlightChk.checked;
+      initialState.platforms    = JSON.stringify(enabledKeys);
+      initialState.langCode     = selectedLangCode;
+      initialState.openBehavior = JSON.stringify(
+        Object.fromEntries(PLATFORM_DEFS.map(p => [p.key, platformOpenSelects[p.key]?.value === "fg"]))
+      );
+
+      return langChanged;
     }
 
     function doClose() {
@@ -1058,19 +1287,44 @@
       panel.appendChild(dialog);
     }
 
-    const closeBtn = document.createElement("button");
-    closeBtn.className = "grok-lang-btn";
-    closeBtn.innerText = LangSystem.getText("close_btn");
-    closeBtn.style.textAlign = "center";
-    closeBtn.style.marginTop = "10px";
-    closeBtn.onclick = () => {
+    const footer = document.createElement("div");
+    footer.className = "gfc-panel-footer";
+    const unsavedDot = document.createElement("div");
+    unsavedDot.className = "gfc-unsaved-dot";
+    unsavedDot.title = LangSystem.getText("unsaved_footer_hint");
+    const saveBtn = document.createElement("button");
+    saveBtn.className = "grok-save-btn";
+    saveBtn.innerText = LangSystem.getText("custom_prompt_save");
+    saveBtn.onclick = () => {
+      const langChanged = doSave();
+      saveBtn.innerText = LangSystem.getText("custom_prompt_saved");
+      saveBtn.classList.add("saved");
+      refreshFooterState();
+      if (langChanged) {
+        setTimeout(() => {
+          doClose();
+          setTimeout(() => showLanguageSelectionUI(currentTab), 360);
+        }, 700);
+      } else {
+        setTimeout(() => doClose(), 700);
+      }
+    };
+    footer.appendChild(unsavedDot);
+    footer.appendChild(saveBtn);
+    panel.appendChild(footer);
+
+    function refreshFooterState() {
+      unsavedDot.classList.toggle("visible", hasUnsavedChanges());
+    }
+    refreshFooterState();
+
+    headerCloseBtn.onclick = () => {
       if (hasUnsavedChanges()) {
         showUnsavedDialog();
       } else {
         doClose();
       }
     };
-    panel.appendChild(closeBtn);
 
     overlay.appendChild(panel);
     overlay.style.opacity = "0";
@@ -1100,23 +1354,19 @@
     return JSON.stringify(template, null, 2);
   }
 
-  function buildCustomLangSection(panel) {
-    const divider = document.createElement("hr");
-    divider.className = "grok-settings-divider";
-    panel.appendChild(divider);
-
+  function buildCustomLangSection(card) {
     const sectionLabel = document.createElement("div");
-    sectionLabel.className = "grok-settings-section-label";
-    sectionLabel.innerText = "\u270f\ufe0f Custom Language";
-    panel.appendChild(sectionLabel);
+    sectionLabel.className = "gfc-card-title";
+    sectionLabel.innerText = LangSystem.getText("custom_lang_section");
+    card.appendChild(sectionLabel);
 
     const statusRow = document.createElement("div");
-    statusRow.style.cssText = "font-size:12px;color:#8899a6;padding:2px 0 8px;";
+    statusRow.style.cssText = "font-size:12px;color:#8899a6;";
     const existing = LangSystem.getCustom();
     statusRow.innerText = existing
-      ? "Loaded: " + (existing.langName || "Custom")
-      : "No custom language loaded.";
-    panel.appendChild(statusRow);
+      ? LangSystem.getText("custom_lang_loaded") + (existing.langName || "Custom")
+      : LangSystem.getText("custom_lang_none");
+    card.appendChild(statusRow);
 
     const btnRow = document.createElement("div");
     btnRow.style.cssText = "display:flex;gap:8px;";
@@ -1124,14 +1374,14 @@
     const exportBtn = document.createElement("button");
     exportBtn.className = "grok-lang-btn";
     exportBtn.style.cssText = "flex:1;text-align:center;font-size:13px;padding:8px 6px;";
-    exportBtn.innerText = "\ud83d\udce4 Export Template";
+    exportBtn.innerText = LangSystem.getText("custom_lang_export");
     exportBtn.onclick = () => showCustomLangDialog("export", statusRow);
     btnRow.appendChild(exportBtn);
 
     const importBtn = document.createElement("button");
     importBtn.className = "grok-lang-btn";
     importBtn.style.cssText = "flex:1;text-align:center;font-size:13px;padding:8px 6px;";
-    importBtn.innerText = "\ud83d\udce5 Import Translation";
+    importBtn.innerText = LangSystem.getText("custom_lang_import");
     importBtn.onclick = () => showCustomLangDialog("import", statusRow);
     btnRow.appendChild(importBtn);
 
@@ -1139,17 +1389,17 @@
     clearBtn.className = "grok-lang-btn";
     clearBtn.style.cssText = "flex:0 0 auto;font-size:13px;padding:8px 10px;color:#f4212e;border-color:#f4212e;";
     clearBtn.innerText = "\ud83d\uddd1";
-    clearBtn.title = "Remove custom language";
+    clearBtn.title = LangSystem.getText("custom_lang_clear_title");
     clearBtn.onclick = () => {
       if (!LangSystem.getCustom()) return;
       GM_setValue("cfg_custom_lang", "");
-      statusRow.innerText = "No custom language loaded.";
+      statusRow.innerText = LangSystem.getText("custom_lang_none");
       statusRow.style.color = "#8899a6";
       setTimeout(() => location.reload(), 400);
     };
     btnRow.appendChild(clearBtn);
 
-    panel.appendChild(btnRow);
+    card.appendChild(btnRow);
   }
 
   function showCustomLangDialog(mode, statusRowRef) {
@@ -1598,7 +1848,99 @@
     try { hideCurtain(800); } catch (e) {}
   }
 
-  function runChatGPTAutomation(forceSend) {
+  function runMetaAutomation(payload, forceSend) {
+    if (!payload) return;
+
+    function findVisibleEditor() {
+      const candidates = document.querySelectorAll('[data-testid="composer-input"][contenteditable="true"]');
+      for (const el of candidates) {
+        if (el.closest(".hidden")) continue;
+        return el;
+      }
+      return null;
+    }
+
+    function findMetaSendBtn() {
+      return document.querySelector('button[data-testid="composer-send-button"]');
+    }
+
+    function fillEditor(editor) {
+      editor.focus();
+      document.execCommand("selectAll", false, null);
+      document.execCommand("delete", false, null);
+
+      let pasteOk = false;
+      try {
+        const dt = new DataTransfer();
+        dt.setData("text/plain", payload);
+        const ev = new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true });
+        editor.dispatchEvent(ev);
+        pasteOk = true;
+      } catch (e) {
+        console.warn("[GrokCheck][Meta] ClipboardEvent paste 失敗：", e);
+      }
+
+      setTimeout(() => {
+        const filled = editor.innerText?.replace(/\n/g, "").trim();
+        if (!pasteOk || !filled || filled.length < 5) {
+          console.log("[GrokCheck][Meta] paste 未生效，改用 execCommand insertText fallback");
+          editor.focus();
+          document.execCommand("selectAll", false, null);
+          document.execCommand("insertText", false, payload);
+        }
+        setTimeout(() => {
+          const actual = editor.innerText?.trim() || "";
+          if (actual.length > 0) {
+            console.log(`[GrokCheck][Meta] 寫入驗證：目前 innerText 長度=${actual.length}`);
+            if (GM_getValue("cfg_highlight_url", false)) {
+              const urlStart = payload.lastIndexOf("https://");
+              if (urlStart !== -1) {
+                requestAnimationFrame(() => {
+                  requestAnimationFrame(() => {
+                    highlightUrlInContenteditable(editor, payload, payload.slice(urlStart));
+                  });
+                });
+              }
+            }
+          } else {
+            console.warn("[GrokCheck][Meta] 寫入驗證失敗！editor.innerText 仍為空");
+          }
+        }, 200);
+        startAutoSend();
+      }, 300);
+    }
+
+    function startAutoSend() {
+      if (!forceSend) return;
+      let sendAttempts = 0;
+      const sendInterval = setInterval(() => {
+        sendAttempts++;
+        const btn = findMetaSendBtn();
+        if (btn && !btn.disabled && btn.getAttribute("aria-disabled") !== "true") {
+          clearInterval(sendInterval);
+          btn.click();
+        } else if (sendAttempts >= 40) {
+          clearInterval(sendInterval);
+        }
+      }, 400);
+    }
+
+    let attempts = 0;
+    const waitEditor = setInterval(() => {
+      attempts++;
+      const editor = findVisibleEditor();
+      if (editor) {
+        clearInterval(waitEditor);
+        console.log(`[GrokCheck][Meta] 找到可見 contenteditable（第 ${attempts} 次嘗試），準備填入 payload，長度=${payload.length}`);
+        fillEditor(editor);
+      } else if (attempts >= 60) {
+        console.warn("[GrokCheck][Meta] 逾時：60 次嘗試後仍找不到可見的 contenteditable composer-input");
+        clearInterval(waitEditor);
+      }
+    }, 400);
+  }
+
+  function runChatGPTAutomation(forceSend, payload) {
     function findTempChatBtn() {
       return (
         document.querySelector("#conversation-header-actions > div > span > button") ||
@@ -1627,6 +1969,15 @@
       );
     }
 
+    function findChatGPTEditor() {
+      return (
+        document.querySelector("#prompt-textarea") ||
+        document.querySelector('div[contenteditable="true"][data-testid="prompt-textarea"]') ||
+        document.querySelector('div.ProseMirror[contenteditable="true"]') ||
+        document.querySelector('div[contenteditable="true"]')
+      );
+    }
+
     function startAutoSend() {
       if (!forceSend) return;
       let sendAttempts = 0;
@@ -1642,6 +1993,28 @@
       }, 400);
     }
 
+    function startHighlightWatch() {
+      if (!GM_getValue("cfg_highlight_url", false) || !payload) return;
+      const urlStart = payload.lastIndexOf("https://");
+      if (urlStart === -1) return;
+      let hlAttempts = 0;
+      const hlInterval = setInterval(() => {
+        hlAttempts++;
+        const editor = findChatGPTEditor();
+        const filled = editor?.innerText?.replace(/\n/g, "").trim();
+        if (editor && filled && filled.length >= 5) {
+          clearInterval(hlInterval);
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              highlightUrlInContenteditable(editor, payload, payload.slice(urlStart));
+            });
+          });
+        } else if (hlAttempts >= 30) {
+          clearInterval(hlInterval);
+        }
+      }, 300);
+    }
+
     let privAttempts = 0;
     const privInterval = setInterval(() => {
       privAttempts++;
@@ -1650,9 +2023,11 @@
         clearInterval(privInterval);
         tempBtn.click();
         startAutoSend();
+        startHighlightWatch();
       } else if (privAttempts >= 30) {
         clearInterval(privInterval);
         startAutoSend();
+        startHighlightWatch();
       }
     }, 300);
   }
@@ -1693,6 +2068,16 @@
           document.execCommand("selectAll", false, null);
           document.execCommand("insertText", false, payload);
         }
+        if (GM_getValue("cfg_highlight_url", false)) {
+          const urlStart = payload.lastIndexOf("https://");
+          if (urlStart !== -1) {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                highlightUrlInContenteditable(editor, payload, payload.slice(urlStart));
+              });
+            });
+          }
+        }
         if (forceSend) {
           setTimeout(() => {
             const btn = findGeminiSendButton();
@@ -1725,12 +2110,80 @@
     }, 400);
   }
 
+  function highlightUrlInContenteditable(editor, fullText, targetSubstring) {
+    try {
+      if (!targetSubstring) return false;
+      const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
+      const nodeRecords = [];
+      let domText = "";
+      let node;
+      while ((node = walker.nextNode())) {
+        nodeRecords.push({ node, start: domText.length });
+        domText += node.textContent;
+      }
+      const urlStart = domText.lastIndexOf(targetSubstring);
+      if (urlStart === -1) return false;
+      const urlEnd = urlStart + targetSubstring.length;
+
+      function locate(pos) {
+        for (let i = nodeRecords.length - 1; i >= 0; i--) {
+          const rec = nodeRecords[i];
+          if (pos >= rec.start) {
+            return { node: rec.node, offset: pos - rec.start };
+          }
+        }
+        return null;
+      }
+
+      const startLoc = locate(urlStart);
+      const endLoc = locate(urlEnd);
+      if (!startLoc || !endLoc) return false;
+
+      const range = document.createRange();
+      range.setStart(startLoc.node, Math.min(startLoc.offset, startLoc.node.textContent.length));
+      range.setEnd(endLoc.node, Math.min(endLoc.offset, endLoc.node.textContent.length));
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      return true;
+    } catch (e) {
+      console.warn("[GrokCheck] highlightUrlInContenteditable 失敗（不影響主流程）：", e);
+      return false;
+    }
+  }
+
   function getEnabledPlatforms() {
     try {
       const val = GM_getValue("cfg_platforms", null);
       if (val) return JSON.parse(val);
     } catch (e) {}
     return ["grok"];
+  }
+
+  function getOpenBehavior(key) {
+    try {
+      const val = GM_getValue("cfg_open_behavior", null);
+      if (val) {
+        const parsed = JSON.parse(val);
+        if (typeof parsed[key] === "boolean") return parsed[key];
+      }
+    } catch (e) {}
+    return true;
+  }
+
+  const NEW_FEATURES = {
+    open_behavior: "1.6.0",
+  };
+  function isFeatureNew(featureKey) {
+    const introducedVersion = NEW_FEATURES[featureKey];
+    if (!introducedVersion) return false;
+    const seenVersion = GM_getValue(`cfg_feature_seen_${featureKey}`, "");
+    return seenVersion !== introducedVersion;
+  }
+  function markFeatureSeen(featureKey) {
+    const introducedVersion = NEW_FEATURES[featureKey];
+    if (!introducedVersion) return;
+    GM_setValue(`cfg_feature_seen_${featureKey}`, introducedVersion);
   }
 
   function buildTabUrl(platform, text, forceSend) {
@@ -1756,6 +2209,12 @@
       GM_setValue("gemini_ts", Date.now());
       const encoded = encodePayload(text);
       return `https://gemini.google.com/#gfc|${forceSend ? "1" : "0"}|${encoded}`;
+    }
+    if (platform === "meta") {
+      GM_setValue("meta_payload", text);
+      GM_setValue("meta_force_send", forceSend);
+      GM_setValue("meta_ts", Date.now());
+      return `https://www.meta.ai/?q=${encodeURIComponent(text)}`;
     }
     console.warn(`[GrokCheck] buildTabUrl: unknown platform "${platform}"`);
     return null;
@@ -1802,7 +2261,7 @@
         btnEl.innerHTML = getPlatformIcon(key);
         const payload = resolvePayload(key);
         const url = buildTabUrl(key, payload, false);
-        if (url) GM_openInTab(url, { active: true });
+        if (url) GM_openInTab(url, { active: getOpenBehavior(key) });
         drop.remove();
       });
 
@@ -1883,7 +2342,7 @@
       const platforms = getEnabledPlatforms();
 
       function buildPayloadFor(platform) {
-        if (platform === "chatgpt") {
+        if (platform === "chatgpt" || platform === "meta") {
           const content = getContentFn ? getContentFn() : "";
           if (content && content.trim()) {
             return `${currentPrompt}${content.trim()}\n${url}`;
@@ -1902,13 +2361,13 @@
         btn.innerHTML = ICONS.SENDING;
         setTimeout(() => { btn.innerHTML = getPlatformIcon(target); }, 2000);
         const tabUrl = buildTabUrl(target, buildPayloadFor(target), true);
-        if (tabUrl) GM_openInTab(tabUrl, { active: true });
+        if (tabUrl) GM_openInTab(tabUrl, { active: getOpenBehavior(target) });
       } else if (platforms.length === 1) {
         const platform = platforms[0];
         btn.innerHTML = ICONS.SENDING;
         setTimeout(() => { btn.innerHTML = getPlatformIcon(platform); }, 2000);
         const tabUrl = buildTabUrl(platform, buildPayloadFor(platform), false);
-        if (tabUrl) GM_openInTab(tabUrl, { active: true });
+        if (tabUrl) GM_openInTab(tabUrl, { active: getOpenBehavior(platform) });
       } else {
         showPlatformDropdown(btn, url, btn, buildPayloadFor);
       }
@@ -2140,6 +2599,7 @@
   }
 
   function init() {
+    console.log(`[GrokCheck] init() 啟動，hostname=${window.location.hostname}`);
     registerMenus();
     if (!GM_getValue("cfg_lang_code")) {
       let defaultCode = "en";
@@ -2210,12 +2670,33 @@
         GM_setValue("chatgpt_payload", "");
         GM_setValue("chatgpt_force_send", false);
         const delay = document.readyState === "loading" ? 2000 : 1500;
-        const run = () => setTimeout(() => runChatGPTAutomation(forceSend), delay);
+        const run = () => setTimeout(() => runChatGPTAutomation(forceSend, payload), delay);
         if (document.readyState === "loading") {
           document.addEventListener("DOMContentLoaded", run);
         } else {
           run();
         }
+      }
+    } else if (window.location.hostname === "www.meta.ai") {
+      const ts       = GM_getValue("meta_ts", 0);
+      const isRecent = (Date.now() - ts) < 30000;
+      const payload  = GM_getValue("meta_payload", "");
+      console.log(`[GrokCheck][Meta] hostname 分流觸發，ts=${ts}，isRecent=${isRecent}，payload長度=${payload.length}`);
+      if (isRecent && payload) {
+        const forceSend = GM_getValue("meta_force_send", false);
+        console.log(`[GrokCheck][Meta] 條件成立，forceSend=${forceSend}，即將排程 runMetaAutomation`);
+        GM_setValue("meta_ts", 0);
+        GM_setValue("meta_payload", "");
+        GM_setValue("meta_force_send", false);
+        const delay = document.readyState === "loading" ? 2000 : 1500;
+        const run = () => setTimeout(() => runMetaAutomation(payload, forceSend), delay);
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", run);
+        } else {
+          run();
+        }
+      } else {
+        console.warn("[GrokCheck][Meta] 條件不成立，automation 不會執行（isRecent 為 false 或 payload 為空）");
       }
     } else if (window.location.hostname === "gemini.google.com") {
       function parseGeminiHashPayload() {
