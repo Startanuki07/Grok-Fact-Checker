@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.6.0.0
+// @version      1.6.2.0
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -30,15 +30,16 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
+// @grant        GM_addStyle
 // @run-at       document-end
-// @description      Adds a 🤖 fact-check button to posts on X, Threads, Bluesky, and Mastodon. Opens Grok, ChatGPT, Gemini, or Meta AI in a new private tab with a pre-filled prompt and post URL. Privacy/focus modes apply automatically. Long-press to auto-send. Includes Grok ad removal and multi-language detection. Note: Meta AI requires Facebook/Instagram login. Ideal for quickly and discreetly verifying unfamiliar news or claims.
-// @description:zh-TW 在 X (Twitter)、Threads、Bluesky 與 Mastodon 每則貼文旁加入 🤖 事實查核按鈕。點擊後自動在新分頁以私人模式開啟 Grok，填入查核 Prompt 與貼文網址，並自動切換隱私模式與專注模式，不留查核紀錄。長按可強制自動送出。附帶自動移除 Grok 廣告、多語言自動偵測。適合偶爾看到不確定的資訊、想低調快速查核的一般用戶。
-// @description:zh-CN 在 X (Twitter)、Threads、Bluesky 与 Mastodon 每条帖子旁添加 🤖 事实核查按钮。点击后自动在新标签页以隐私模式打开 Grok，填入查核 Prompt 与帖子链接，并自动切换隐私模式与专注模式，不留查核记录。长按可强制自动发送。附带自动移除 Grok 广告、多语言自动检测。适合偶尔遇到存疑信息、想低调快速核查的普通用户。
-// @description:ja    X (Twitter)・Threads・Bluesky・Mastodon の各投稿に 🤖 ファクトチェックボタンを追加。クリックで新しいタブにプライベートモードで Grok を起動し、プロンプトと投稿 URL を自動入力。プライバシーモードと集中モードも自動で適用されるため、チェック履歴が残りません。長押しで強制自動送信。Grok 広告の自動除去・多言語自動検出にも対応。
-// @description:ko    X (Twitter)・Threads・Bluesky・Mastodon 의 모든 게시물에 🤖 팩트체크 버튼을 추가합니다. 클릭하면 새 탭에서 비공개 모드로 Grok을 열고 프롬프트와 게시물 URL을 자동 입력합니다. 개인정보 모드와 집중 모드가 자동으로 적용되어 조회 기록이 남지 않습니다. 길게 누르면 강제 자동 전송. Grok 광고 자동 제거 및 다국어 자동 감지 지원.
-// @description:es    Añade un botón 🤖 de verificación de datos a cada publicación en X (Twitter), Threads, Bluesky y Mastodon. Al hacer clic, abre Grok en una nueva pestaña privada con un prompt prellenado y la URL de la publicación. El modo privado y el modo enfoque se aplican automáticamente. Mantén presionado para envío automático instantáneo. Incluye eliminación de anuncios de Grok y detección automática de idioma.
-// @description:pt-BR Adiciona um botão 🤖 de verificação de fatos a cada publicação no X (Twitter), Threads, Bluesky e Mastodon. Clique para abrir o Grok em uma nova aba privada com um prompt pré-preenchido e a URL da publicação. O modo privado e o modo foco são aplicados automaticamente. Pressione e segure para envio automático instantâneo. Inclui remoção de anúncios do Grok e detecção automática de idioma.
-// @description:fr    Ajoute un bouton 🤖 de vérification des faits à chaque publication sur X (Twitter), Threads, Bluesky et Mastodon. Cliquez pour ouvrir Grok dans un nouvel onglet privé avec un prompt prérempli et l'URL de la publication. Le mode privé et le mode concentration sont appliqués automatiquement. Maintenez appuyé pour un envoi automatique instantané. Inclut la suppression des publicités Grok et la détection automatique de la langue.
+// @description      Adds a 🤖 fact-check button next to posts on X (Twitter), Threads, Bluesky, and Mastodon. Choose from Grok, ChatGPT, Gemini, or Meta AI to check a post's claims in one click. Best suited for users who occasionally encounter unfamiliar news or claims and want a quick, discreet way to verify them.
+// @description:zh-TW 在 X (Twitter)、Threads、Bluesky 與 Mastodon 的貼文旁加入 🤖 查核按鈕，可選擇 Grok、ChatGPT、Gemini 或 Meta AI，一鍵查核貼文內容。適合偶爾看到不確定的資訊、想低調快速查核的一般用戶。
+// @description:zh-CN 在 X (Twitter)、Threads、Bluesky 与 Mastodon 的帖子旁添加 🤖 核查按钮，可选择 Grok、ChatGPT、Gemini 或 Meta AI，一键核查帖子内容。适合偶尔遇到存疑信息、想低调快速核查的普通用户。
+// @description:ja    X (Twitter)・Threads・Bluesky・Mastodon の投稿に 🤖 ファクトチェックボタンを追加。Grok・ChatGPT・Gemini・Meta AI から選んでワンクリックで内容を確認できます。気になる情報をさりげなく手早く確認したい方に向いています。
+// @description:ko    X (Twitter)・Threads・Bluesky・Mastodon 게시물에 🤖 팩트체크 버튼을 추가합니다. Grok・ChatGPT・Gemini・Meta AI 중에서 선택해 클릭 한 번으로 내용을 확인할 수 있습니다. 가끔 접하는 낯선 정보를 조용히 빠르게 확인하고 싶은 분에게 적합합니다.
+// @description:es    Añade un botón 🤖 de verificación a las publicaciones en X (Twitter), Threads, Bluesky y Mastodon. Elige entre Grok, ChatGPT, Gemini o Meta AI para verificar el contenido con un clic. Ideal para quienes ocasionalmente ven información dudosa y quieren comprobarla de forma rápida y discreta.
+// @description:pt-BR Adiciona um botão 🤖 de verificação às publicações no X (Twitter), Threads, Bluesky e Mastodon. Escolha entre Grok, ChatGPT, Gemini ou Meta AI para verificar o conteúdo com um clique. Ideal para quem ocasionalmente encontra informações duvidosas e quer verificá-las de forma rápida e discreta.
+// @description:fr    Ajoute un bouton 🤖 de vérification aux publications sur X (Twitter), Threads, Bluesky et Mastodon. Choisissez Grok, ChatGPT, Gemini ou Meta AI pour vérifier le contenu en un clic. Idéal pour ceux qui rencontrent occasionnellement des informations douteuses et veulent les vérifier rapidement et discrètement.
 // ==/UserScript==
 
 (function () {
@@ -500,6 +501,7 @@
 
     getKey: () => LangSystem._currentKey,
     setKey: (code) => {
+      LangSystem._syncCustomIntoDict();
       if (!LANG_DICT[code]) return;
       LangSystem._currentKey = code;
       GM_setValue("cfg_lang_code", code);
@@ -517,7 +519,21 @@
       return null;
     },
 
+    _syncCustomIntoDict: () => {
+      const custom = LangSystem.getCustom();
+      if (custom) {
+        LANG_DICT.custom = {
+          name:   "🈺 " + (custom.langName || "Custom"),
+          prompt: custom.prompt,
+          ui:     custom.ui,
+        };
+      } else {
+        delete LANG_DICT.custom;
+      }
+    },
+
     getCurrent: () => {
+      LangSystem._syncCustomIntoDict();
       const code = LangSystem.getKey();
       if (code && LANG_DICT[code]) return LANG_DICT[code];
 
@@ -535,8 +551,6 @@
     },
 
     getText: (key) => {
-      const custom = LangSystem.getCustom();
-      if (custom && custom.ui[key]) return custom.ui[key];
       const dict = LangSystem.getCurrent();
       return dict.ui[key] || LANG_DICT["zh-TW"].ui[key] || key;
     },
@@ -546,8 +560,6 @@
         const custom = GM_getValue("cfg_custom_prompt", "").trim();
         if (custom) return custom + "\n";
       }
-      const customLang = LangSystem.getCustom();
-      if (customLang && customLang.prompt) return customLang.prompt;
       return LangSystem.getCurrent().prompt;
     },
   };
@@ -596,8 +608,7 @@
     );
   }
 
-  const style = document.createElement("style");
-  style.textContent = `
+  GM_addStyle(`
         .my-grok-robot-btn {
             display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px;
             border-radius: 9999px; background-color: transparent; color: rgb(113, 118, 123);
@@ -832,8 +843,7 @@
         body.grok-focus-mode div[data-testid="TopNavBar"] { display: none !important; }
         body.grok-focus-mode main[role="main"] { align-items: center !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
         body.grok-focus-mode div[data-testid="primaryColumn"] { max-width: 900px !important; width: 100% !important; margin: 0 auto !important; border: none !important; }
-    `;
-  document.head.appendChild(style);
+    `);
 
   function findAny(selectors, root = document) {
     for (const selector of selectors) {
@@ -1168,6 +1178,7 @@
       return "en";
     })();
     let selectedLangCode = initialLangCode;
+    LangSystem._syncCustomIntoDict();
     const langGrid = document.createElement("div");
     langGrid.className = "gfc-lang-grid";
     const langCells = {};
@@ -1393,6 +1404,10 @@
     clearBtn.onclick = () => {
       if (!LangSystem.getCustom()) return;
       GM_setValue("cfg_custom_lang", "");
+      if (LangSystem.getKey() === "custom") {
+        GM_setValue("cfg_lang_code", null);
+        LangSystem._currentKey = null;
+      }
       statusRow.innerText = LangSystem.getText("custom_lang_none");
       statusRow.style.color = "#8899a6";
       setTimeout(() => location.reload(), 400);
@@ -1530,6 +1545,7 @@
             prompt:   parsed.prompt,
             ui:       parsed.ui,
           }));
+          LangSystem.setKey("custom");
           if (statusRowRef) {
             statusRowRef.innerText = "Loaded: " + (parsed.langName || "Custom");
             statusRowRef.style.color = "#00ba7c";
@@ -2262,7 +2278,6 @@
         const payload = resolvePayload(key);
         const url = buildTabUrl(key, payload, false);
         if (url) GM_openInTab(url, { active: getOpenBehavior(key) });
-        drop.remove();
       });
 
       drop.appendChild(item);
@@ -2341,13 +2356,10 @@
       const currentPrompt = LangSystem.getPrompt();
       const platforms = getEnabledPlatforms();
 
-      function buildPayloadFor(platform) {
-        if (platform === "chatgpt" || platform === "meta") {
-          const content = getContentFn ? getContentFn() : "";
-          if (content && content.trim()) {
-            return `${currentPrompt}${content.trim()}\n${url}`;
-          }
-          return `${currentPrompt}${url}`;
+      function buildPayloadFor(_platform) {
+        const content = getContentFn ? getContentFn() : "";
+        if (content && content.trim()) {
+          return `${currentPrompt}\n"${content.trim()}"\n\n${url}`;
         }
         return `${currentPrompt}${url}`;
       }
@@ -2451,6 +2463,11 @@
           || toolbar.parentElement;
         const getContent = () => {
           if (!postContainer) return "";
+          const langDiv = postContainer.querySelector("div[lang]");
+          if (langDiv) {
+            const t = langDiv.innerText?.trim();
+            if (t) return t;
+          }
           const textNodes = postContainer.querySelectorAll('span[dir="auto"], div[dir="auto"]');
           for (const node of textNodes) {
             const t = node.innerText?.trim();
