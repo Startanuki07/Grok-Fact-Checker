@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.6.2.0
+// @version      1.6.3.3
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -44,6 +44,10 @@
 
 (function () {
   "use strict";
+
+  const escapeHtmlText = s => String(s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
   const LANG_DICT = {
     "zh-TW": {
@@ -80,6 +84,7 @@
         custom_prompt_save: "💾 儲存設定",
         custom_prompt_saved: "✅ 已儲存",
         highlight_url_checkbox: "填入後反白貼文網址（方便手動刪除）",
+        curtain_animation_checkbox: "跳轉後顯示轉場動畫（黑幕進度提示）",
         unsaved_title: "有未儲存的變更",
         unsaved_save_close: "💾 儲存並關閉",
         unsaved_discard: "不儲存，直接關閉",
@@ -100,6 +105,8 @@
         custom_lang_import: "📥 匯入翻譯",
         custom_lang_clear_title: "移除自訂語言",
         unsaved_footer_hint: "有未儲存的變更",
+        meta_login_notice: "需登入 FB/IG",
+        highlight_note: "⚠️ 非 Grok 平台（ChatGPT/Gemini/Meta AI）也支援反白，但準確度依各網站而定",
       },
     },
     "zh-CN": {
@@ -136,6 +143,7 @@
         custom_prompt_save: "💾 保存设置",
         custom_prompt_saved: "✅ 已保存",
         highlight_url_checkbox: "填入后反白贴文链接（方便手动删除）",
+        curtain_animation_checkbox: "跳转后显示转场动画（黑幕进度提示）",
         unsaved_title: "有未保存的更改",
         unsaved_save_close: "💾 保存并关闭",
         unsaved_discard: "不保存，直接关闭",
@@ -156,6 +164,8 @@
         custom_lang_import: "📥 导入翻译",
         custom_lang_clear_title: "移除自定义语言",
         unsaved_footer_hint: "有未保存的更改",
+        meta_login_notice: "需登录 FB/IG",
+        highlight_note: "⚠️ 非 Grok 平台（ChatGPT/Gemini/Meta AI）也支持高亮，但准确度依各网站而定",
       },
     },
     en: {
@@ -192,6 +202,7 @@
         custom_prompt_save: "💾 Save Settings",
         custom_prompt_saved: "✅ Saved",
         highlight_url_checkbox: "Highlight post URL after filling (easy to delete manually)",
+        curtain_animation_checkbox: "Show transition animation after redirect (overlay progress)",
         unsaved_title: "You have unsaved changes",
         unsaved_save_close: "💾 Save & Close",
         unsaved_discard: "Discard & Close",
@@ -212,6 +223,8 @@
         custom_lang_import: "📥 Import Translation",
         custom_lang_clear_title: "Remove custom language",
         unsaved_footer_hint: "You have unsaved changes",
+        meta_login_notice: "requires FB/IG login",
+        highlight_note: "⚠️ Highlighting on non-Grok platforms (ChatGPT/Gemini/Meta AI) works, but accuracy may still vary by site.",
       },
     },
     ja: {
@@ -248,6 +261,7 @@
         custom_prompt_save: "💾 設定を保存",
         custom_prompt_saved: "✅ 保存完了",
         highlight_url_checkbox: "入力後に投稿URLをハイライト（手動削除しやすくする）",
+        curtain_animation_checkbox: "遷移後にトランジションアニメーションを表示（進捗オーバーレイ）",
         unsaved_title: "保存されていない変更があります",
         unsaved_save_close: "💾 保存して閉じる",
         unsaved_discard: "保存せずに閉じる",
@@ -268,6 +282,8 @@
         custom_lang_import: "📥 翻訳を読み込む",
         custom_lang_clear_title: "カスタム言語を削除",
         unsaved_footer_hint: "保存されていない変更があります",
+        meta_login_notice: "FB/IG のログインが必要",
+        highlight_note: "⚠️ Grok 以外のプラットフォーム（ChatGPT/Gemini/Meta AI）でもハイライトは機能しますが、精度はサイトによって異なります。",
       },
     },
     ko: {
@@ -304,6 +320,7 @@
         custom_prompt_save: "💾 설정 저장",
         custom_prompt_saved: "✅ 저장됨",
         highlight_url_checkbox: "입력 후 게시물 URL 강조 표시 (수동 삭제 용이)",
+        curtain_animation_checkbox: "이동 후 전환 애니메이션 표시 (오버레이 진행 표시)",
         unsaved_title: "저장되지 않은 변경 사항이 있습니다",
         unsaved_save_close: "💾 저장 후 닫기",
         unsaved_discard: "저장 안 하고 닫기",
@@ -324,6 +341,8 @@
         custom_lang_import: "📥 번역 가져오기",
         custom_lang_clear_title: "사용자 지정 언어 삭제",
         unsaved_footer_hint: "저장되지 않은 변경 사항이 있습니다",
+        meta_login_notice: "FB/IG 로그인 필요",
+        highlight_note: "⚠️ Grok 외 플랫폼(ChatGPT/Gemini/Meta AI)에서도 하이라이트가 작동하지만, 정확도는 사이트마다 다를 수 있습니다.",
       },
     },
     es: {
@@ -360,6 +379,7 @@
         custom_prompt_save: "💾 Guardar configuración",
         custom_prompt_saved: "✅ Guardado",
         highlight_url_checkbox: "Resaltar URL de publicación al rellenar (fácil de eliminar manualmente)",
+        curtain_animation_checkbox: "Mostrar animación de transición tras redirigir (superposición de progreso)",
         unsaved_title: "Hay cambios sin guardar",
         unsaved_save_close: "💾 Guardar y cerrar",
         unsaved_discard: "Cerrar sin guardar",
@@ -380,6 +400,8 @@
         custom_lang_import: "📥 Importar traducción",
         custom_lang_clear_title: "Quitar idioma personalizado",
         unsaved_footer_hint: "Hay cambios sin guardar",
+        meta_login_notice: "requiere inicio de sesión en FB/IG",
+        highlight_note: "⚠️ El resaltado funciona en plataformas que no son Grok (ChatGPT/Gemini/Meta AI), pero la precisión puede variar según el sitio.",
       },
     },
     "pt-BR": {
@@ -416,6 +438,7 @@
         custom_prompt_save: "💾 Salvar configurações",
         custom_prompt_saved: "✅ Salvo",
         highlight_url_checkbox: "Destacar URL da publicação ao preencher (fácil de excluir manualmente)",
+        curtain_animation_checkbox: "Mostrar animação de transição após redirecionar (sobreposição de progresso)",
         unsaved_title: "Há alterações não salvas",
         unsaved_save_close: "💾 Salvar e fechar",
         unsaved_discard: "Fechar sem salvar",
@@ -436,6 +459,8 @@
         custom_lang_import: "📥 Importar tradução",
         custom_lang_clear_title: "Remover idioma personalizado",
         unsaved_footer_hint: "Há alterações não salvas",
+        meta_login_notice: "requer login no FB/IG",
+        highlight_note: "⚠️ O destaque funciona em plataformas fora do Grok (ChatGPT/Gemini/Meta AI), mas a precisão pode variar de acordo com o site.",
       },
     },
     fr: {
@@ -472,6 +497,7 @@
         custom_prompt_save: "💾 Enregistrer les paramètres",
         custom_prompt_saved: "✅ Enregistré",
         highlight_url_checkbox: "Surligner l'URL de la publication après remplissage (suppression manuelle facile)",
+        curtain_animation_checkbox: "Afficher l'animation de transition après redirection (superposition de progression)",
         unsaved_title: "Des modifications non enregistrées existent",
         unsaved_save_close: "💾 Enregistrer et fermer",
         unsaved_discard: "Fermer sans enregistrer",
@@ -492,6 +518,8 @@
         custom_lang_import: "📥 Importer la traduction",
         custom_lang_clear_title: "Supprimer la langue personnalisée",
         unsaved_footer_hint: "Des modifications non enregistrées existent",
+        meta_login_notice: "connexion FB/IG requise",
+        highlight_note: "⚠️ La surbrillance fonctionne sur les plateformes autres que Grok (ChatGPT/Gemini/Meta AI), mais la précision peut varier selon le site.",
       },
     },
   };
@@ -590,7 +618,7 @@
     { key: "grok",    name: "Grok",    color: "#1d9bf0" },
     { key: "chatgpt", name: "ChatGPT", color: "#10a37f" },
     { key: "gemini",  name: "Gemini",  color: "#8b5cf6" },
-    { key: "meta",    name: "Meta AI (需登入 FB/IG)", color: "#0866ff" },
+    { key: "meta",    name: "Meta AI",    color: "#0866ff" },
   ];
 
   function registerMenus() {
@@ -758,6 +786,12 @@
             0%, 100% { box-shadow: 0 0 0 0 rgba(244,33,46,0.5); }
             50%      { box-shadow: 0 0 0 4px rgba(244,33,46,0); }
         }
+        
+        .gfc-new-badge-inline {
+            display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+            background: #f4212e; flex-shrink: 0; pointer-events: none;
+            animation: gfc-new-pulse 1.6s ease-in-out infinite;
+        }
 
         .gfc-lang-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
@@ -897,10 +931,12 @@
   let curtainElement = null;
   let curtainMsgElement = null;
   let curtainSubElement = null;
-  const CURTAIN_ENABLED = true;
+  function isCurtainEnabled() {
+    return GM_getValue("cfg_curtain_enabled", true);
+  }
 
   function showCurtain(initialText, subText = "") {
-    if (!CURTAIN_ENABLED) return;
+    if (!isCurtainEnabled()) return;
     const old = document.querySelector(".grok-curtain-overlay");
     if (old) old.parentNode?.removeChild(old);
 
@@ -920,13 +956,13 @@
   }
 
   function updateCurtainText(text, sub = null) {
-    if (!CURTAIN_ENABLED) return;
+    if (!isCurtainEnabled()) return;
     if (curtainMsgElement) curtainMsgElement.textContent = text;
     if (sub !== null && curtainSubElement) curtainSubElement.textContent = sub;
   }
 
   function hideCurtain(delay = 500) {
-    if (!CURTAIN_ENABLED) return;
+    if (!isCurtainEnabled()) return;
     if (curtainElement) {
       setTimeout(() => {
         if (curtainElement)
@@ -1072,7 +1108,7 @@
     const highlightNote = document.createElement("div");
     highlightNote.className = "gfc-card-hint gfc-collapse";
     highlightNote.style.paddingLeft = "26px";
-    highlightNote.innerText = "⚠️ Highlighting on non-Grok platforms (ChatGPT/Gemini/Meta AI) works, but accuracy may still vary by site.";
+    highlightNote.innerText = LangSystem.getText("highlight_note");
     function updateHighlightNote() {
       const checkedKeys = Object.entries(platformCheckboxes)
         .filter(([, c]) => c.checked).map(([k]) => k);
@@ -1081,6 +1117,30 @@
     highlightCard.appendChild(highlightNote);
     highlightChk.addEventListener("change", refreshFooterState);
     tabPanes.template.appendChild(highlightCard);
+
+    const curtainCard = document.createElement("div");
+    curtainCard.className = "gfc-card";
+    const curtainRow = document.createElement("label");
+    curtainRow.className = "grok-custom-checkbox-row";
+    const curtainChk = document.createElement("input");
+    curtainChk.type = "checkbox";
+    curtainChk.checked = GM_getValue("cfg_curtain_enabled", true);
+    const curtainLabel = document.createElement("span");
+    curtainLabel.innerText = LangSystem.getText("curtain_animation_checkbox");
+    curtainRow.appendChild(curtainChk);
+    curtainRow.appendChild(curtainLabel);
+    if (isFeatureNew("curtain_all_platforms")) {
+      const curtainBadge = document.createElement("span");
+      curtainBadge.className = "gfc-new-badge-inline";
+      curtainRow.appendChild(curtainBadge);
+      curtainChk.addEventListener("change", () => {
+        markFeatureSeen("curtain_all_platforms");
+        curtainBadge.remove();
+      }, { once: true });
+    }
+    curtainCard.appendChild(curtainRow);
+    curtainChk.addEventListener("change", refreshFooterState);
+    tabPanes.template.appendChild(curtainCard);
 
     const platformCard = document.createElement("div");
     platformCard.className = "gfc-card";
@@ -1107,7 +1167,7 @@
       iconEl.innerHTML = getPlatformIcon(key);
 
       const nameEl = document.createElement("span");
-      nameEl.innerText = name;
+      nameEl.innerText = key === "meta" ? `${name} (${LangSystem.getText("meta_login_notice")})` : name;
 
       const wrapper = document.createElement("span");
       wrapper.className = "gfc-plat-row-name";
@@ -1207,6 +1267,7 @@
       enabled:   GM_getValue("cfg_custom_prompt_enabled", false),
       prompt:    GM_getValue("cfg_custom_prompt", "").trim(),
       highlight: GM_getValue("cfg_highlight_url", false),
+      curtain:   GM_getValue("cfg_curtain_enabled", true),
       platforms: GM_getValue("cfg_platforms", '["grok"]'),
       langCode:  initialLangCode,
       openBehavior: JSON.stringify(
@@ -1225,6 +1286,7 @@
         checkbox.checked      !== initialState.enabled      ||
         textarea.value.trim() !== initialState.prompt       ||
         highlightChk.checked  !== initialState.highlight    ||
+        curtainChk.checked    !== initialState.curtain      ||
         currentPlatforms      !== initialState.platforms    ||
         selectedLangCode      !== initialState.langCode     ||
         currentOpenBehavior   !== initialState.openBehavior
@@ -1239,6 +1301,7 @@
       GM_setValue("cfg_custom_prompt_enabled", checkbox.checked);
       GM_setValue("cfg_custom_prompt", textarea.value.trim());
       GM_setValue("cfg_highlight_url", highlightChk.checked);
+      GM_setValue("cfg_curtain_enabled", curtainChk.checked);
       GM_setValue("cfg_open_behavior", JSON.stringify(
         Object.fromEntries(PLATFORM_DEFS.map(p => [p.key, platformOpenSelects[p.key]?.value === "fg"]))
       ));
@@ -1254,6 +1317,7 @@
       initialState.enabled      = checkbox.checked;
       initialState.prompt       = textarea.value.trim();
       initialState.highlight    = highlightChk.checked;
+      initialState.curtain      = curtainChk.checked;
       initialState.platforms    = JSON.stringify(enabledKeys);
       initialState.langCode     = selectedLangCode;
       initialState.openBehavior = JSON.stringify(
@@ -1786,64 +1850,67 @@
           setTimeout(() => {
             simulateTypeInput(textarea, payload);
 
-            if (GM_getValue("cfg_highlight_url", false)) {
+            const highlightDone = waitForHighlight((finish) => {
+              if (!GM_getValue("cfg_highlight_url", false)) return finish();
               const urlStart = payload.lastIndexOf("https://");
-              if (urlStart !== -1) {
+              if (urlStart === -1) return finish();
+              requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                  requestAnimationFrame(() => {
-                    try {
-                      textarea.focus();
-                      textarea.setSelectionRange(urlStart, payload.length);
-                    } catch (e) {}
-                  });
+                  try {
+                    textarea.focus();
+                    textarea.setSelectionRange(urlStart, payload.length);
+                  } catch (e) {}
+                  finish();
                 });
-              }
-            }
+              });
+            }, 200);
 
-            if (shouldSend) {
-              updateCurtainText(LangSystem.getText("sending"), statusTitle);
+            highlightDone.then(() => {
+              if (shouldSend) {
+                updateCurtainText(LangSystem.getText("sending"), statusTitle);
 
-              const sendBtnPre = findSendButton();
+                const sendBtnPre = findSendButton();
 
-              let sendFired = false;
-              function fireSend(trigger) {
-                if (sendFired) return;
-                sendFired = true;
-                sendObs.disconnect();
-                clearTimeout(sendFallback);
-                if (!textarea.value) {
-                  simulateTypeInput(textarea, payload);
+                let sendFired = false;
+                function fireSend(trigger) {
+                  if (sendFired) return;
+                  sendFired = true;
+                  sendObs.disconnect();
+                  clearTimeout(sendFallback);
+                  if (!textarea.value) {
+                    simulateTypeInput(textarea, payload);
+                  }
+                  const btn = findSendButton();
+                  if (btn) {
+                    safeSimulateClick(btn);
+                    updateCurtainText(LangSystem.getText("done"));
+                  } else {
+                    updateCurtainText(LangSystem.getText("error_btn"), LangSystem.getText("error_btn_sub"));
+                  }
+                  cleanup();
                 }
-                const btn = findSendButton();
-                if (btn) {
-                  safeSimulateClick(btn);
-                  updateCurtainText(LangSystem.getText("done"));
-                } else {
-                  updateCurtainText(LangSystem.getText("error_btn"), LangSystem.getText("error_btn_sub"));
-                }
+
+                const sendObs = new MutationObserver(() => {
+                  const btn = findSendButton();
+                  if (btn && !btn.disabled && btn.getAttribute("aria-disabled") !== "true") {
+                    fireSend("MutationObserver");
+                  }
+                });
+                sendObs.observe(document.body, {
+                  subtree: true,
+                  attributes: true,
+                  attributeFilter: ["disabled", "aria-disabled"],
+                });
+
+                const sendFallback = setTimeout(() => {
+                  fireSend("fallback");
+                }, 1500);
+
+              } else {
+                updateCurtainText(LangSystem.getText("done_manual"), LangSystem.getText("done_manual_sub"));
                 cleanup();
               }
-
-              const sendObs = new MutationObserver(() => {
-                const btn = findSendButton();
-                if (btn && !btn.disabled && btn.getAttribute("aria-disabled") !== "true") {
-                  fireSend("MutationObserver");
-                }
-              });
-              sendObs.observe(document.body, {
-                subtree: true,
-                attributes: true,
-                attributeFilter: ["disabled", "aria-disabled"],
-              });
-
-              const sendFallback = setTimeout(() => {
-                fireSend("fallback");
-              }, 1500);
-
-            } else {
-              updateCurtainText(LangSystem.getText("done_manual"), LangSystem.getText("done_manual_sub"));
-              cleanup();
-            }
+            });
           }, 500);
 
         } else if (attempts >= maxAttempts) {
@@ -1866,6 +1933,7 @@
 
   function runMetaAutomation(payload, forceSend) {
     if (!payload) return;
+    showCurtain(LangSystem.getText("init"), forceSend ? LangSystem.getText("mode_direct") : LangSystem.getText("mode_std"));
 
     function findVisibleEditor() {
       const candidates = document.querySelectorAll('[data-testid="composer-input"][contenteditable="true"]');
@@ -1881,6 +1949,7 @@
     }
 
     function fillEditor(editor) {
+      updateCurtainText(LangSystem.getText("writing"));
       editor.focus();
       document.execCommand("selectAll", false, null);
       document.execCommand("delete", false, null);
@@ -1897,37 +1966,48 @@
       }
 
       setTimeout(() => {
+        const expectedLen = payload.replace(/\n/g, "").trim().length;
         const filled = editor.innerText?.replace(/\n/g, "").trim();
-        if (!pasteOk || !filled || filled.length < 5) {
+        if (!pasteOk || !filled || filled.length < expectedLen - 5) {
           console.log("[GrokCheck][Meta] paste 未生效，改用 execCommand insertText fallback");
           editor.focus();
           document.execCommand("selectAll", false, null);
           document.execCommand("insertText", false, payload);
         }
-        setTimeout(() => {
-          const actual = editor.innerText?.trim() || "";
-          if (actual.length > 0) {
-            console.log(`[GrokCheck][Meta] 寫入驗證：目前 innerText 長度=${actual.length}`);
-            if (GM_getValue("cfg_highlight_url", false)) {
-              const urlStart = payload.lastIndexOf("https://");
-              if (urlStart !== -1) {
-                requestAnimationFrame(() => {
+        const highlightDone = waitForHighlight((finish) => {
+          setTimeout(() => {
+            const actual = editor.innerText?.trim() || "";
+            if (actual.length > 0) {
+              console.log(`[GrokCheck][Meta] 寫入驗證：目前 innerText 長度=${actual.length}`);
+              if (GM_getValue("cfg_highlight_url", false)) {
+                const urlStart = payload.lastIndexOf("https://");
+                if (urlStart !== -1) {
                   requestAnimationFrame(() => {
-                    highlightUrlInContenteditable(editor, payload, payload.slice(urlStart));
+                    requestAnimationFrame(() => {
+                      highlightUrlInContenteditable(editor, payload, payload.slice(urlStart));
+                      finish();
+                    });
                   });
-                });
+                  return;
+                }
               }
+            } else {
+              console.warn("[GrokCheck][Meta] 寫入驗證失敗！editor.innerText 仍為空");
             }
-          } else {
-            console.warn("[GrokCheck][Meta] 寫入驗證失敗！editor.innerText 仍為空");
-          }
-        }, 200);
-        startAutoSend();
+            finish();
+          }, 200);
+        }, 500);
+        highlightDone.then(startAutoSend);
       }, 300);
     }
 
     function startAutoSend() {
-      if (!forceSend) return;
+      if (!forceSend) {
+        updateCurtainText(LangSystem.getText("done_manual"), LangSystem.getText("done_manual_sub"));
+        hideCurtain();
+        return;
+      }
+      updateCurtainText(LangSystem.getText("sending"));
       let sendAttempts = 0;
       const sendInterval = setInterval(() => {
         sendAttempts++;
@@ -1935,8 +2015,12 @@
         if (btn && !btn.disabled && btn.getAttribute("aria-disabled") !== "true") {
           clearInterval(sendInterval);
           btn.click();
+          updateCurtainText(LangSystem.getText("done"));
+          hideCurtain(800);
         } else if (sendAttempts >= 40) {
           clearInterval(sendInterval);
+          updateCurtainText(LangSystem.getText("error_btn"), LangSystem.getText("error_btn_sub"));
+          hideCurtain(800);
         }
       }, 400);
     }
@@ -1952,23 +2036,15 @@
       } else if (attempts >= 60) {
         console.warn("[GrokCheck][Meta] 逾時：60 次嘗試後仍找不到可見的 contenteditable composer-input");
         clearInterval(waitEditor);
+        updateCurtainText(LangSystem.getText("error_timeout"), LangSystem.getText("error_timeout_sub"));
+        hideCurtain(800);
       }
     }, 400);
   }
 
   function runChatGPTAutomation(forceSend, payload) {
-    function findTempChatBtn() {
-      return (
-        document.querySelector("#conversation-header-actions > div > span > button") ||
-        document.querySelector('button[aria-label*="暫存對話"]') ||
-        document.querySelector('button[aria-label*="Temporary chat"]') ||
-        document.querySelector('button[aria-label*="一時的なチャット"]') ||
-        document.querySelector('button[aria-label*="임시 채팅"]') ||
-        document.querySelector('button[aria-label*="Chat temporal"]') ||
-        document.querySelector('button[aria-label*="Chat temporaire"]') ||
-        document.querySelector('button[aria-label*="Chat temporário"]')
-      );
-    }
+    if (!payload) return;
+    showCurtain(LangSystem.getText("init"), forceSend ? LangSystem.getText("mode_direct") : LangSystem.getText("mode_std"));
 
     function findChatGPTSendBtn() {
       return (
@@ -1995,7 +2071,12 @@
     }
 
     function startAutoSend() {
-      if (!forceSend) return;
+      if (!forceSend) {
+        updateCurtainText(LangSystem.getText("done_manual"), LangSystem.getText("done_manual_sub"));
+        hideCurtain();
+        return;
+      }
+      updateCurtainText(LangSystem.getText("sending"));
       let sendAttempts = 0;
       const sendInterval = setInterval(() => {
         sendAttempts++;
@@ -2003,53 +2084,48 @@
         if (btn && !btn.disabled && btn.getAttribute("aria-disabled") !== "true") {
           clearInterval(sendInterval);
           btn.click();
+          updateCurtainText(LangSystem.getText("done"));
+          hideCurtain(800);
         } else if (sendAttempts >= 40) {
           clearInterval(sendInterval);
+          updateCurtainText(LangSystem.getText("error_btn"), LangSystem.getText("error_btn_sub"));
+          hideCurtain(800);
         }
       }, 400);
     }
 
     function startHighlightWatch() {
-      if (!GM_getValue("cfg_highlight_url", false) || !payload) return;
-      const urlStart = payload.lastIndexOf("https://");
-      if (urlStart === -1) return;
-      let hlAttempts = 0;
-      const hlInterval = setInterval(() => {
-        hlAttempts++;
-        const editor = findChatGPTEditor();
-        const filled = editor?.innerText?.replace(/\n/g, "").trim();
-        if (editor && filled && filled.length >= 5) {
-          clearInterval(hlInterval);
-          requestAnimationFrame(() => {
+      return waitForHighlight((finish) => {
+        if (!GM_getValue("cfg_highlight_url", false) || !payload) return finish();
+        const urlStart = payload.lastIndexOf("https://");
+        if (urlStart === -1) return finish();
+        let hlAttempts = 0;
+        const hlInterval = setInterval(() => {
+          hlAttempts++;
+          const editor = findChatGPTEditor();
+          const filled = editor?.innerText?.replace(/\n/g, "").trim();
+          if (editor && filled && filled.length >= 5) {
+            clearInterval(hlInterval);
             requestAnimationFrame(() => {
-              highlightUrlInContenteditable(editor, payload, payload.slice(urlStart));
+              requestAnimationFrame(() => {
+                highlightUrlInContenteditable(editor, payload, payload.slice(urlStart));
+                finish();
+              });
             });
-          });
-        } else if (hlAttempts >= 30) {
-          clearInterval(hlInterval);
-        }
-      }, 300);
+          } else if (hlAttempts >= 30) {
+            clearInterval(hlInterval);
+            finish();
+          }
+        }, 300);
+      }, 9500);
     }
 
-    let privAttempts = 0;
-    const privInterval = setInterval(() => {
-      privAttempts++;
-      const tempBtn = findTempChatBtn();
-      if (tempBtn) {
-        clearInterval(privInterval);
-        tempBtn.click();
-        startAutoSend();
-        startHighlightWatch();
-      } else if (privAttempts >= 30) {
-        clearInterval(privInterval);
-        startAutoSend();
-        startHighlightWatch();
-      }
-    }, 300);
+    startHighlightWatch().then(startAutoSend);
   }
 
   function runGeminiAutomation(payload, forceSend) {
     if (!payload) return;
+    showCurtain(LangSystem.getText("init"), forceSend ? LangSystem.getText("mode_direct") : LangSystem.getText("mode_std"));
 
     function findGeminiSendButton() {
       for (const ic of document.querySelectorAll("button mat-icon")) {
@@ -2063,6 +2139,7 @@
     }
 
     function fillEditor(editor) {
+      updateCurtainText(LangSystem.getText("writing"));
       editor.focus();
       document.execCommand("selectAll", false, null);
       document.execCommand("delete", false, null);
@@ -2071,34 +2148,51 @@
       try {
         const dt = new DataTransfer();
         dt.setData("text/plain", payload);
-        dt.setData("text/html", "<p>" + payload.replace(/\n/g, "</p><p>") + "</p>");
+        dt.setData("text/html", "<p>" + escapeHtmlText(payload).replace(/\n/g, "</p><p>") + "</p>");
         const ev = new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true });
         editor.dispatchEvent(ev);
         pasteOk = true;
       } catch (e) {}
 
       setTimeout(() => {
+        const expectedLen = payload.replace(/\n/g, "").trim().length;
         const filled = editor.innerText?.replace(/\n/g, "").trim();
-        if (!pasteOk || !filled || filled.length < 5) {
+        if (!pasteOk || !filled || filled.length < expectedLen - 5) {
           editor.focus();
           document.execCommand("selectAll", false, null);
           document.execCommand("insertText", false, payload);
         }
-        if (GM_getValue("cfg_highlight_url", false)) {
+        const highlightDone = waitForHighlight((finish) => {
+          if (!GM_getValue("cfg_highlight_url", false)) return finish();
           const urlStart = payload.lastIndexOf("https://");
-          if (urlStart !== -1) {
+          if (urlStart === -1) return finish();
+          requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-              requestAnimationFrame(() => {
-                highlightUrlInContenteditable(editor, payload, payload.slice(urlStart));
-              });
+              highlightUrlInContenteditable(editor, payload, payload.slice(urlStart));
+              finish();
             });
-          }
-        }
+          });
+        }, 200);
+
         if (forceSend) {
-          setTimeout(() => {
-            const btn = findGeminiSendButton();
-            if (btn) btn.click();
-          }, 900);
+          updateCurtainText(LangSystem.getText("sending"));
+          highlightDone.then(() => {
+            setTimeout(() => {
+              const btn = findGeminiSendButton();
+              if (btn) {
+                btn.click();
+                updateCurtainText(LangSystem.getText("done"));
+              } else {
+                updateCurtainText(LangSystem.getText("error_btn"), LangSystem.getText("error_btn_sub"));
+              }
+              hideCurtain(800);
+            }, 700);
+          });
+        } else {
+          highlightDone.then(() => {
+            updateCurtainText(LangSystem.getText("done_manual"), LangSystem.getText("done_manual_sub"));
+            hideCurtain();
+          });
         }
       }, 400);
     }
@@ -2110,20 +2204,46 @@
       if (editor) {
         clearInterval(waitEditor);
 
-        const tempBtn = document.querySelector("temp-chat-button button");
-        if (tempBtn) {
-          tempBtn.click();
-          setTimeout(() => {
-            const editorAfter = document.querySelector('div.ql-editor[contenteditable="true"]');
-            fillEditor(editorAfter || editor);
-          }, 700);
-        } else {
-          fillEditor(editor);
-        }
+        let tempBtnAttempts = 0;
+        const waitTempBtn = setInterval(() => {
+          tempBtnAttempts++;
+          const tempBtn = document.querySelector("temp-chat-button button");
+          if (tempBtn) {
+            clearInterval(waitTempBtn);
+            tempBtn.click();
+            setTimeout(() => {
+              const editorAfter = document.querySelector('div.ql-editor[contenteditable="true"]');
+              fillEditor(editorAfter || editor);
+            }, 700);
+          } else if (tempBtnAttempts >= 60) {
+            clearInterval(waitTempBtn);
+            console.warn("[GrokCheck][Gemini] 逾時：60 次嘗試後仍找不到 temp-chat-button，降級為不開無痕直接填字");
+            fillEditor(editor);
+          }
+        }, 300);
       } else if (attempts >= 60) {
         clearInterval(waitEditor);
+        updateCurtainText(LangSystem.getText("error_timeout"), LangSystem.getText("error_timeout_sub"));
+        hideCurtain(800);
       }
     }, 400);
+  }
+
+  function waitForHighlight(runHighlight, timeoutMs) {
+    return new Promise((resolve) => {
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        resolve();
+      };
+      try {
+        runHighlight(finish);
+      } catch (e) {
+        finish();
+      }
+      setTimeout(finish, timeoutMs);
+    });
   }
 
   function highlightUrlInContenteditable(editor, fullText, targetSubstring) {
@@ -2189,6 +2309,7 @@
 
   const NEW_FEATURES = {
     open_behavior: "1.6.0",
+    curtain_all_platforms: "1.6.3",
   };
   function isFeatureNew(featureKey) {
     const introducedVersion = NEW_FEATURES[featureKey];
@@ -2217,7 +2338,7 @@
       GM_setValue("chatgpt_payload", text);
       GM_setValue("chatgpt_force_send", forceSend);
       GM_setValue("chatgpt_ts", Date.now());
-      return `https://chatgpt.com/?prompt=${encodeURIComponent(text)}`;
+      return `https://chatgpt.com/?prompt=${encodeURIComponent(text)}&temporary-chat=true`;
     }
     if (platform === "gemini") {
       GM_setValue("gemini_payload", text);
@@ -2269,7 +2390,7 @@
       item.appendChild(iconEl);
 
       const nameEl = document.createElement("span");
-      nameEl.innerText = name;
+      nameEl.innerText = key === "meta" ? `${name} (${LangSystem.getText("meta_login_notice")})` : name;
       item.appendChild(nameEl);
 
       item.addEventListener("click", (e) => {
