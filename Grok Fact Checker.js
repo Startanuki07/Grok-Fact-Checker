@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.6.3.3
+// @version      1.6.4.0
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -2046,6 +2046,39 @@
     if (!payload) return;
     showCurtain(LangSystem.getText("init"), forceSend ? LangSystem.getText("mode_direct") : LangSystem.getText("mode_std"));
 
+    (function watchAndClearAfterSubmit() {
+      let btnExistedLastPoll = null;
+      let textAtSubmit = null;
+      let pendingChecks = 0;
+      let attempts = 0;
+      const pollInterval = setInterval(() => {
+        attempts++;
+        const editor = findChatGPTEditor();
+        const btn = findChatGPTSendBtn();
+        const btnExists = !!btn;
+
+        if (textAtSubmit === null) {
+          if (btnExistedLastPoll === true && btnExists === false && editor) {
+            textAtSubmit = editor.innerText;
+            pendingChecks = 0;
+          }
+          btnExistedLastPoll = btnExists;
+        } else {
+          pendingChecks++;
+          if (editor && editor.isConnected && textAtSubmit.trim() && editor.innerText === textAtSubmit && pendingChecks >= 2) {
+            editor.focus();
+            document.execCommand("selectAll", false, null);
+            document.execCommand("delete", false, null);
+            clearInterval(pollInterval);
+          } else if (editor && editor.innerText !== textAtSubmit) {
+            clearInterval(pollInterval);
+          }
+        }
+
+        if (attempts >= 60) clearInterval(pollInterval);
+      }, 500);
+    })();
+
     function findChatGPTSendBtn() {
       return (
         document.querySelector('button[data-testid="send-button"]') ||
@@ -2323,7 +2356,7 @@
     GM_setValue(`cfg_feature_seen_${featureKey}`, introducedVersion);
   }
 
-  function buildTabUrl(platform, text, forceSend) {
+  async function buildTabUrl(platform, text, forceSend) {
     function encodePayload(str) {
       const bytes = new TextEncoder().encode(str);
       let binary = "";
@@ -2335,22 +2368,22 @@
       return `${GROK_URL}#gfc|${forceSend ? "1" : "0"}|${encoded}`;
     }
     if (platform === "chatgpt") {
-      GM_setValue("chatgpt_payload", text);
-      GM_setValue("chatgpt_force_send", forceSend);
-      GM_setValue("chatgpt_ts", Date.now());
+      await GM_setValue("chatgpt_payload", text);
+      await GM_setValue("chatgpt_force_send", forceSend);
+      await GM_setValue("chatgpt_ts", Date.now());
       return `https://chatgpt.com/?prompt=${encodeURIComponent(text)}&temporary-chat=true`;
     }
     if (platform === "gemini") {
-      GM_setValue("gemini_payload", text);
-      GM_setValue("gemini_force_send", forceSend);
-      GM_setValue("gemini_ts", Date.now());
+      await GM_setValue("gemini_payload", text);
+      await GM_setValue("gemini_force_send", forceSend);
+      await GM_setValue("gemini_ts", Date.now());
       const encoded = encodePayload(text);
       return `https://gemini.google.com/#gfc|${forceSend ? "1" : "0"}|${encoded}`;
     }
     if (platform === "meta") {
-      GM_setValue("meta_payload", text);
-      GM_setValue("meta_force_send", forceSend);
-      GM_setValue("meta_ts", Date.now());
+      await GM_setValue("meta_payload", text);
+      await GM_setValue("meta_force_send", forceSend);
+      await GM_setValue("meta_ts", Date.now());
       return `https://www.meta.ai/?q=${encodeURIComponent(text)}`;
     }
     console.warn(`[GrokCheck] buildTabUrl: unknown platform "${platform}"`);
@@ -2393,11 +2426,11 @@
       nameEl.innerText = key === "meta" ? `${name} (${LangSystem.getText("meta_login_notice")})` : name;
       item.appendChild(nameEl);
 
-      item.addEventListener("click", (e) => {
+      item.addEventListener("click", async (e) => {
         e.stopPropagation();
         btnEl.innerHTML = getPlatformIcon(key);
         const payload = resolvePayload(key);
-        const url = buildTabUrl(key, payload, false);
+        const url = await buildTabUrl(key, payload, false);
         if (url) GM_openInTab(url, { active: getOpenBehavior(key) });
       });
 
@@ -2465,7 +2498,7 @@
         }
       }
     });
-    btn.addEventListener("mouseup", (e) => {
+    btn.addEventListener("mouseup", async (e) => {
       if (e.button !== 0) return;
       if (pressTimer) clearTimeout(pressTimer);
       e.stopPropagation();
@@ -2493,13 +2526,13 @@
         const target = platforms.includes("grok") ? "grok" : platforms[0];
         btn.innerHTML = ICONS.SENDING;
         setTimeout(() => { btn.innerHTML = getPlatformIcon(target); }, 2000);
-        const tabUrl = buildTabUrl(target, buildPayloadFor(target), true);
+        const tabUrl = await buildTabUrl(target, buildPayloadFor(target), true);
         if (tabUrl) GM_openInTab(tabUrl, { active: getOpenBehavior(target) });
       } else if (platforms.length === 1) {
         const platform = platforms[0];
         btn.innerHTML = ICONS.SENDING;
         setTimeout(() => { btn.innerHTML = getPlatformIcon(platform); }, 2000);
-        const tabUrl = buildTabUrl(platform, buildPayloadFor(platform), false);
+        const tabUrl = await buildTabUrl(platform, buildPayloadFor(platform), false);
         if (tabUrl) GM_openInTab(tabUrl, { active: getOpenBehavior(platform) });
       } else {
         showPlatformDropdown(btn, url, btn, buildPayloadFor);
