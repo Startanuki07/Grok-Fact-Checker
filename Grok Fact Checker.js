@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.6.4.0
+// @version      1.6.5.0
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -75,12 +75,19 @@
         error_timeout_sub: "找不到輸入框",
         error_script: "❌ 腳本錯誤",
         error_script_sub: "請查看控制台",
-        toggle_focus: "切換專注模式",
         settings_title: "⚙️ 設定選項 / 切換語言",
         lang_section_title: "🌐 切換語言",
         custom_prompt_section: "🤖 自訂 AI 問答模版",
         custom_prompt_checkbox: "啟用自訂模版（取代預設查核指令）",
         custom_prompt_placeholder: "輸入自訂 AI 問答指令...\n\n（貼文網址將自動附加在末尾）",
+        template_add_btn: "➕ 新增模版",
+        template_name_placeholder: "模版名稱",
+        template_delete_btn: "🗑️",
+        template_limit_reached: "已達上限（最多 10 個模版）",
+        template_select_title: "選擇查核模版",
+        template_empty_hint: "尚未建立任何模版，點擊上方按鈕新增",
+        platform_select_title: "選擇查核平台",
+        open_settings_tooltip: "開啟設定",
         custom_prompt_save: "💾 儲存設定",
         custom_prompt_saved: "✅ 已儲存",
         highlight_url_checkbox: "填入後反白貼文網址（方便手動刪除）",
@@ -134,12 +141,19 @@
         error_timeout_sub: "找不到输入框",
         error_script: "❌ 脚本错误",
         error_script_sub: "请查看控制台",
-        toggle_focus: "切换专注模式",
         settings_title: "⚙️ 设置选项 / 切换语言",
         lang_section_title: "🌐 切换语言",
         custom_prompt_section: "🤖 自定义 AI 问答模板",
         custom_prompt_checkbox: "启用自定义模板（替代默认查核指令）",
         custom_prompt_placeholder: "输入自定义 AI 问答指令...\n\n（帖子链接将自动附加在末尾）",
+        template_add_btn: "➕ 新增模板",
+        template_name_placeholder: "模板名称",
+        template_delete_btn: "🗑️",
+        template_limit_reached: "已达上限（最多 10 个模板）",
+        template_select_title: "选择查核模板",
+        template_empty_hint: "尚未创建任何模板，点击上方按钮新增",
+        platform_select_title: "选择查核平台",
+        open_settings_tooltip: "打开设置",
         custom_prompt_save: "💾 保存设置",
         custom_prompt_saved: "✅ 已保存",
         highlight_url_checkbox: "填入后反白贴文链接（方便手动删除）",
@@ -193,12 +207,19 @@
         error_timeout_sub: "Input box not found",
         error_script: "❌ Script Error",
         error_script_sub: "Check Console",
-        toggle_focus: "Toggle Focus Mode",
         settings_title: "⚙️ Settings & Language",
         lang_section_title: "🌐 Select Language",
         custom_prompt_section: "🤖 Custom AI Prompt Template",
         custom_prompt_checkbox: "Use custom template (replaces default fact-check prompt)",
         custom_prompt_placeholder: "Enter your custom AI prompt...\n\n(Post URL will be appended automatically)",
+        template_add_btn: "➕ Add Template",
+        template_name_placeholder: "Template name",
+        template_delete_btn: "🗑️",
+        template_limit_reached: "Limit reached (max 10 templates)",
+        template_select_title: "Choose a Template",
+        template_empty_hint: "No templates yet. Click the button above to add one.",
+        platform_select_title: "Choose a Platform",
+        open_settings_tooltip: "Open Settings",
         custom_prompt_save: "💾 Save Settings",
         custom_prompt_saved: "✅ Saved",
         highlight_url_checkbox: "Highlight post URL after filling (easy to delete manually)",
@@ -252,12 +273,19 @@
         error_timeout_sub: "入力欄が見つかりません",
         error_script: "❌ スクリプトエラー",
         error_script_sub: "コンソールを確認",
-        toggle_focus: "集中モード切替",
         settings_title: "⚙️ 設定 / 言語切替",
         lang_section_title: "🌐 言語を選択",
         custom_prompt_section: "🤖 カスタムAIプロンプト",
         custom_prompt_checkbox: "カスタムテンプレートを使用（デフォルト指示を置き換え）",
         custom_prompt_placeholder: "カスタムAIプロンプトを入力...\n\n（投稿URLは自動的に末尾に追加されます）",
+        template_add_btn: "➕ テンプレート追加",
+        template_name_placeholder: "テンプレート名",
+        template_delete_btn: "🗑️",
+        template_limit_reached: "上限に達しました（最大10個）",
+        template_select_title: "テンプレートを選択",
+        template_empty_hint: "テンプレートがまだありません。上のボタンから追加してください",
+        platform_select_title: "プラットフォームを選択",
+        open_settings_tooltip: "設定を開く",
         custom_prompt_save: "💾 設定を保存",
         custom_prompt_saved: "✅ 保存完了",
         highlight_url_checkbox: "入力後に投稿URLをハイライト（手動削除しやすくする）",
@@ -311,12 +339,19 @@
         error_timeout_sub: "입력창을 찾을 수 없음",
         error_script: "❌ 스크립트 오류",
         error_script_sub: "콘솔 확인",
-        toggle_focus: "집중 모드 전환",
         settings_title: "⚙️ 설정 / 언어 전환",
         lang_section_title: "🌐 언어 선택",
         custom_prompt_section: "🤖 커스텀 AI 프롬프트",
         custom_prompt_checkbox: "커스텀 템플릿 사용 (기본 팩트체크 명령 대체)",
         custom_prompt_placeholder: "커스텀 AI 프롬프트 입력...\n\n(게시물 URL이 자동으로 추가됩니다)",
+        template_add_btn: "➕ 템플릿 추가",
+        template_name_placeholder: "템플릿 이름",
+        template_delete_btn: "🗑️",
+        template_limit_reached: "한도 도달 (최대 10개)",
+        template_select_title: "템플릿 선택",
+        template_empty_hint: "아직 템플릿이 없습니다. 위 버튼을 눌러 추가하세요",
+        platform_select_title: "플랫폼 선택",
+        open_settings_tooltip: "설정 열기",
         custom_prompt_save: "💾 설정 저장",
         custom_prompt_saved: "✅ 저장됨",
         highlight_url_checkbox: "입력 후 게시물 URL 강조 표시 (수동 삭제 용이)",
@@ -370,12 +405,19 @@
         error_timeout_sub: "Cuadro de entrada no encontrado",
         error_script: "❌ Error de script",
         error_script_sub: "Revisa la consola",
-        toggle_focus: "Alternar modo enfoque",
         settings_title: "⚙️ Configuración / Idioma",
         lang_section_title: "🌐 Seleccionar idioma",
         custom_prompt_section: "🤖 Plantilla AI personalizada",
         custom_prompt_checkbox: "Usar plantilla personalizada (reemplaza el prompt predeterminado)",
         custom_prompt_placeholder: "Ingresa tu prompt AI personalizado...\n\n(La URL de la publicación se añadirá automáticamente)",
+        template_add_btn: "➕ Añadir plantilla",
+        template_name_placeholder: "Nombre de la plantilla",
+        template_delete_btn: "🗑️",
+        template_limit_reached: "Límite alcanzado (máx. 10 plantillas)",
+        template_select_title: "Elige una plantilla",
+        template_empty_hint: "Aún no hay plantillas. Haz clic arriba para añadir una.",
+        platform_select_title: "Elige una plataforma",
+        open_settings_tooltip: "Abrir configuración",
         custom_prompt_save: "💾 Guardar configuración",
         custom_prompt_saved: "✅ Guardado",
         highlight_url_checkbox: "Resaltar URL de publicación al rellenar (fácil de eliminar manualmente)",
@@ -429,12 +471,19 @@
         error_timeout_sub: "Caixa de entrada não encontrada",
         error_script: "❌ Erro de script",
         error_script_sub: "Verifique o console",
-        toggle_focus: "Alternar modo foco",
         settings_title: "⚙️ Configurações / Idioma",
         lang_section_title: "🌐 Selecionar idioma",
         custom_prompt_section: "🤖 Modelo AI personalizado",
         custom_prompt_checkbox: "Usar modelo personalizado (substitui o prompt padrão)",
         custom_prompt_placeholder: "Digite seu prompt AI personalizado...\n\n(A URL da publicação será adicionada automaticamente)",
+        template_add_btn: "➕ Adicionar modelo",
+        template_name_placeholder: "Nome do modelo",
+        template_delete_btn: "🗑️",
+        template_limit_reached: "Limite atingido (máx. 10 modelos)",
+        template_select_title: "Escolha um modelo",
+        template_empty_hint: "Ainda não há modelos. Clique acima para adicionar um.",
+        platform_select_title: "Escolha uma plataforma",
+        open_settings_tooltip: "Abrir configurações",
         custom_prompt_save: "💾 Salvar configurações",
         custom_prompt_saved: "✅ Salvo",
         highlight_url_checkbox: "Destacar URL da publicação ao preencher (fácil de excluir manualmente)",
@@ -488,12 +537,19 @@
         error_timeout_sub: "Zone de saisie introuvable",
         error_script: "❌ Erreur de script",
         error_script_sub: "Vérifiez la console",
-        toggle_focus: "Basculer le mode concentration",
         settings_title: "⚙️ Paramètres / Langue",
         lang_section_title: "🌐 Sélectionner la langue",
         custom_prompt_section: "🤖 Modèle AI personnalisé",
         custom_prompt_checkbox: "Utiliser un modèle personnalisé (remplace le prompt par défaut)",
         custom_prompt_placeholder: "Entrez votre prompt AI personnalisé...\n\n(L'URL de la publication sera ajoutée automatiquement)",
+        template_add_btn: "➕ Ajouter un modèle",
+        template_name_placeholder: "Nom du modèle",
+        template_delete_btn: "🗑️",
+        template_limit_reached: "Limite atteinte (10 modèles max.)",
+        template_select_title: "Choisir un modèle",
+        template_empty_hint: "Aucun modèle pour l'instant. Cliquez ci-dessus pour en ajouter un.",
+        platform_select_title: "Choisir une plateforme",
+        open_settings_tooltip: "Ouvrir les paramètres",
         custom_prompt_save: "💾 Enregistrer les paramètres",
         custom_prompt_saved: "✅ Enregistré",
         highlight_url_checkbox: "Surligner l'URL de la publication après remplissage (suppression manuelle facile)",
@@ -583,10 +639,13 @@
       return dict.ui[key] || LANG_DICT["zh-TW"].ui[key] || key;
     },
 
-    getPrompt: () => {
-      if (GM_getValue("cfg_custom_prompt_enabled", false)) {
-        const custom = GM_getValue("cfg_custom_prompt", "").trim();
-        if (custom) return custom + "\n";
+    getPrompt: (templateContent) => {
+      if (typeof templateContent === "string" && templateContent) {
+        return templateContent + "\n";
+      }
+      const enabledTemplates = getEnabledTemplates();
+      if (enabledTemplates.length > 0) {
+        return enabledTemplates[0].content + "\n";
       }
       return LangSystem.getCurrent().prompt;
     },
@@ -601,16 +660,16 @@
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke="#1d9bf0" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 14l11 -11" /><path d="M21 3l-6.5 18a.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a.55 .55 0 0 1 0 -1l18 -6.5" /></svg>',
     ROCKET:
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke="#f91880" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 13a8 8 0 0 1 7 7a6 6 0 0 0 3 -5a9 9 0 0 0 6 -8a3 3 0 0 0 -3 -3a9 9 0 0 0 -8 6a6 6 0 0 0 -5 3" /><path d="M7 14a6 6 0 0 0 -3 8" /><path d="M14 7a6 6 0 0 0 8 -3" /></svg>',
-    EYE_OPEN:
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>',
-    EYE_OFF:
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 3.15 -3.692 5.252 -4.753m3.243 -.745c.168 -.006 .337 -.006 .505 .006c3.6 0 6.6 2 9 6c-.632 1.053 -1.333 1.944 -2.103 2.673" /><path d="M3 3l18 18" /></svg>',
     CHATGPT:
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z" /><path d="M9.5 9h5" /><path d="M9.5 13h3.5" /></svg>',
     GEMINI:
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C11.45 8.05 8.05 11.45 2 12C8.05 12.55 11.45 15.95 12 22C12.55 15.95 15.95 12.55 22 12C15.95 11.45 12.55 8.05 12 2Z"/></svg>',
     META:
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 8.5C4 8.5 2.5 10.5 2.5 12.5S4 16.5 6.5 16.5c2.8 0 4-2 5.5-4.5m0 0c1.5-2.5 2.7-4.5 5.5-4.5 2.5 0 4 2 4 4.5s-1.5 4.5-4 4.5c-2.8 0-4-2-5.5-4.5"/></svg>',
+    GEAR:
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" /><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /></svg>',
+    TEMPLATE:
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 9h8" /><path d="M8 13h6" /><path d="M9 18h-3a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-3l-3 3l-3 -3z" /></svg>',
   };
   ICONS.GROK = ICONS.ROBOT;
 
@@ -620,6 +679,39 @@
     { key: "gemini",  name: "Gemini",  color: "#8b5cf6" },
     { key: "meta",    name: "Meta AI",    color: "#0866ff" },
   ];
+
+  const CUSTOM_TEMPLATE_LIMIT = 10;
+
+  function getCustomTemplates() {
+    const raw = GM_getValue("cfg_custom_templates", null);
+    if (raw !== null) {
+      try {
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    const oldPrompt = GM_getValue("cfg_custom_prompt", "").trim();
+    const oldEnabled = GM_getValue("cfg_custom_prompt_enabled", false);
+    if (oldPrompt) {
+      const migrated = [{ id: "t1", name: "Template 1", content: oldPrompt, enabled: true }];
+      GM_setValue("cfg_custom_templates", JSON.stringify(migrated));
+      GM_setValue("cfg_custom_templates_enabled", oldEnabled);
+      return migrated;
+    }
+    return [];
+  }
+
+  function isCustomTemplatesEnabled() {
+    getCustomTemplates();
+    return GM_getValue("cfg_custom_templates_enabled", false);
+  }
+
+  function getEnabledTemplates() {
+    if (!isCustomTemplatesEnabled()) return [];
+    return getCustomTemplates().filter((t) => t.enabled && t.content && t.content.trim());
+  }
 
   function registerMenus() {
     GM_registerMenuCommand(LangSystem.getText("menu_lang"), () => {
@@ -695,6 +787,44 @@
         }
         .grok-custom-textarea:focus { outline: none; border-color: #1d9bf0; }
         .grok-custom-textarea::placeholder { color: #536471; }
+
+        .gfc-collapse-flex {
+            display: flex; flex-direction: column; gap: 10px;
+            overflow: hidden; max-height: 0; opacity: 0; margin-top: 0;
+            transition: max-height 0.25s ease, opacity 0.2s ease, margin-top 0.25s ease;
+        }
+        .gfc-collapse-flex.open { max-height: 2000px; opacity: 1; margin-top: 4px; }
+        .gfc-template-list { display: flex; flex-direction: column; gap: 10px; }
+        .gfc-template-card {
+            background: #14171a; border: 1px solid #2f3336; border-radius: 10px;
+            padding: 10px; display: flex; flex-direction: column; gap: 8px;
+        }
+        .gfc-template-card-header { display: flex; align-items: center; gap: 8px; }
+        .gfc-template-card-header input[type="checkbox"] {
+            width: 16px; height: 16px; accent-color: #1d9bf0; cursor: pointer; flex-shrink: 0;
+        }
+        .gfc-template-name-input {
+            flex: 1; min-width: 0; background: #0d1117; border: 1px solid #536471; border-radius: 6px;
+            color: #e7e9ea; font-size: 13px; padding: 6px 8px; font-family: inherit;
+            box-sizing: border-box; transition: border-color 0.2s;
+        }
+        .gfc-template-name-input:focus { outline: none; border-color: #1d9bf0; }
+        .gfc-template-name-input::placeholder { color: #536471; }
+        .gfc-template-delete-btn {
+            background: transparent; border: none; color: #8899a6; cursor: pointer;
+            width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; transition: all 0.15s; flex-shrink: 0; font-size: 13px; padding: 0;
+        }
+        .gfc-template-delete-btn:hover { background: rgba(244, 33, 46, 0.12); color: #f4212e; }
+        .gfc-template-add-btn {
+            background: transparent; border: 1px dashed #536471; color: #8899a6;
+            padding: 9px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;
+            transition: all 0.15s; width: 100%;
+        }
+        .gfc-template-add-btn:hover { border-color: #1d9bf0; color: #1d9bf0; }
+        .gfc-template-add-btn:disabled { opacity: 0.4; cursor: not-allowed; border-color: #2f3336; color: #536471; }
+        .gfc-template-limit-hint { color: #f4212e; font-size: 11px; text-align: center; }
+
         .grok-save-btn {
             background: #1d9bf0; border: none; color: white;
             padding: 10px; border-radius: 8px; cursor: pointer;
@@ -816,9 +946,9 @@
         .gfc-unsaved-dot.visible { opacity: 1; transform: scale(1); }
 
         .gfc-plat-drop {
-            background: #16181c; border: 1px solid #2f3336; border-radius: 12px;
-            padding: 6px; display: flex; flex-direction: column; gap: 2px;
-            box-shadow: 0 -4px 24px rgba(0,0,0,0.6); min-width: 168px;
+            background: #16181c; border: 1px solid #2f3336; border-radius: 14px;
+            padding: 8px; display: flex; flex-direction: column; gap: 2px;
+            box-shadow: 0 -4px 24px rgba(0,0,0,0.6); min-width: 208px;
             z-index: 2147483647; transform: translateZ(0);
             animation: gfc-drop-in 0.15s ease-out;
         }
@@ -826,16 +956,54 @@
             from { opacity: 0; transform: translateY(6px) translateZ(0); }
             to   { opacity: 1; transform: translateY(0)   translateZ(0); }
         }
+        .gfc-plat-drop.gfc-drop-fade-out {
+            animation: gfc-drop-out 0.13s ease-in forwards;
+        }
+        @keyframes gfc-drop-out {
+            from { opacity: 1; transform: translateY(0)  translateZ(0); }
+            to   { opacity: 0; transform: translateY(-4px) translateZ(0); }
+        }
+        
+        .gfc-plat-drop-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 4px 6px 8px 8px; margin-bottom: 4px;
+            border-bottom: 1px solid #2f3336;
+        }
+        .gfc-plat-drop-title {
+            font-size: 11px; font-weight: 700; color: #8899a6;
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .gfc-plat-gear-btn {
+            background: transparent; border: none; color: #8899a6; cursor: pointer;
+            width: 24px; height: 24px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; padding: 0;
+            transition: background 0.15s, color 0.15s, transform 0.3s; flex-shrink: 0;
+        }
+        .gfc-plat-gear-btn:hover { background: rgba(255,255,255,0.1); color: #e7e9ea; transform: rotate(45deg); }
+        .gfc-plat-gear-btn svg { width: 15px; height: 15px; }
         .gfc-plat-item {
             display: flex; align-items: center; gap: 10px;
             background: transparent; border: none; color: #e7e9ea;
-            padding: 9px 12px; border-radius: 8px; cursor: pointer;
+            padding: 7px 8px; border-radius: 10px; cursor: pointer;
             font-size: 14px; font-weight: 500; transition: background 0.12s;
             width: 100%; text-align: left;
         }
         .gfc-plat-item:hover { background: rgba(255,255,255,0.08); }
-        .gfc-plat-item-icon { width: 18px; height: 18px; display: inline-flex; flex-shrink: 0; }
-        .gfc-plat-item-icon svg { width: 18px; height: 18px; }
+        
+        .gfc-plat-item:not(:last-child) {
+            margin-bottom: 5px;
+            position: relative;
+        }
+        .gfc-plat-item:not(:last-child)::after {
+            content: ""; position: absolute; left: 8px; right: 8px; bottom: -3px;
+            height: 1px; background: rgba(255,255,255,0.08);
+        }
+        
+        .gfc-plat-item-icon {
+            width: 28px; height: 28px; display: inline-flex; align-items: center;
+            justify-content: center; flex-shrink: 0; border-radius: 8px;
+        }
+        .gfc-plat-item-icon svg { width: 16px; height: 16px; }
 
         .grok-unsaved-dialog {
             position: absolute; inset: 0; background: rgba(0,0,0,0.75);
@@ -860,23 +1028,6 @@
         .grok-unsaved-btn.ghost   { background: transparent; color: #8899a6; border: 1px solid #536471; }
         .grok-unsaved-row { display: flex; gap: 10px; width: 100%; }
         .grok-unsaved-row .grok-unsaved-btn { width: auto; flex: 1; }
-
-        .grok-sidebar-toggle {
-            position: fixed; bottom: 20px; left: 20px; width: 40px; height: 40px;
-            background-color: rgba(21, 32, 43, 0.8); border: 1px solid rgba(113, 118, 123, 0.3);
-            border-radius: 50%; color: #eff3f4; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 9999; transition: all 0.2s; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            opacity: 0; pointer-events: none;
-        }
-        .grok-sidebar-toggle:hover { background-color: rgba(29, 155, 240, 0.9); transform: scale(1.1); opacity: 1 !important; pointer-events: auto !important; }
-        .grok-sidebar-toggle.visible { opacity: 1; pointer-events: auto; }
-        .grok-sidebar-toggle svg { width: 22px; height: 22px; }
-
-        body.grok-focus-mode header[role="banner"],
-        body.grok-focus-mode [data-testid="sidebarColumn"],
-        body.grok-focus-mode div[data-testid="TopNavBar"] { display: none !important; }
-        body.grok-focus-mode main[role="main"] { align-items: center !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
-        body.grok-focus-mode div[data-testid="primaryColumn"] { max-width: 900px !important; width: 100% !important; margin: 0 auto !important; border: none !important; }
     `);
 
   function findAny(selectors, root = document) {
@@ -906,26 +1057,6 @@
         }
       }
     });
-  }
-
-  function createSidebarToggle() {
-    if (document.querySelector(".grok-sidebar-toggle")) return;
-    const btn = document.createElement("div");
-    btn.className = "grok-sidebar-toggle";
-    btn.innerHTML = ICONS.EYE_OPEN;
-    btn.title = LangSystem.getText("toggle_focus");
-    let isFocusMode = false;
-    btn.addEventListener("click", () => {
-      isFocusMode = !isFocusMode;
-      if (isFocusMode) {
-        document.body.classList.add("grok-focus-mode");
-        btn.innerHTML = ICONS.EYE_OFF;
-      } else {
-        document.body.classList.remove("grok-focus-mode");
-        btn.innerHTML = ICONS.EYE_OPEN;
-      }
-    });
-    document.body.appendChild(btn);
   }
 
   let curtainElement = null;
@@ -1021,6 +1152,11 @@
         badge.className = "gfc-new-badge";
         tabBtn.appendChild(badge);
       }
+      if (key === "template" && isFeatureNew("custom_templates")) {
+        const badge = document.createElement("span");
+        badge.className = "gfc-new-badge";
+        tabBtn.appendChild(badge);
+      }
       tabBtn.onclick = () => switchTab(key);
       tabBar.appendChild(tabBtn);
       tabBtns[key] = tabBtn;
@@ -1048,10 +1184,18 @@
         markFeatureSeen("open_behavior");
         tabBtns.platform.querySelector(".gfc-new-badge")?.remove();
       }
+      if (key === "template" && isFeatureNew("custom_templates")) {
+        markFeatureSeen("custom_templates");
+        tabBtns.template.querySelector(".gfc-new-badge")?.remove();
+      }
     }
     if (initialTab === "platform" && isFeatureNew("open_behavior")) {
       markFeatureSeen("open_behavior");
       tabBtns.platform.querySelector(".gfc-new-badge")?.remove();
+    }
+    if (initialTab === "template" && isFeatureNew("custom_templates")) {
+      markFeatureSeen("custom_templates");
+      tabBtns.template.querySelector(".gfc-new-badge")?.remove();
     }
 
     const templateCard = document.createElement("div");
@@ -1066,27 +1210,120 @@
     checkRow.className = "grok-custom-checkbox-row";
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
-    checkbox.checked = GM_getValue("cfg_custom_prompt_enabled", false);
+    checkbox.checked = isCustomTemplatesEnabled();
     const checkLabel = document.createElement("span");
     checkLabel.innerText = LangSystem.getText("custom_prompt_checkbox");
     checkRow.appendChild(checkbox);
     checkRow.appendChild(checkLabel);
     templateCard.appendChild(checkRow);
 
-    const textareaWrap = document.createElement("div");
-    textareaWrap.className = "gfc-collapse" + (checkbox.checked ? " open" : "");
-    const textarea = document.createElement("textarea");
-    textarea.className = "grok-custom-textarea";
-    textarea.placeholder = LangSystem.getText("custom_prompt_placeholder");
-    textarea.value = GM_getValue("cfg_custom_prompt", "");
-    textarea.style.height = "88px";
-    textarea.style.minHeight = "88px";
-    textarea.style.resize = "none";
-    textareaWrap.appendChild(textarea);
-    templateCard.appendChild(textareaWrap);
+    const templateListWrap = document.createElement("div");
+    templateListWrap.className = "gfc-collapse-flex" + (checkbox.checked ? " open" : "");
+
+    const emptyHint = document.createElement("div");
+    emptyHint.className = "gfc-card-hint";
+    emptyHint.innerText = LangSystem.getText("template_empty_hint");
+    templateListWrap.appendChild(emptyHint);
+
+    const templateList = document.createElement("div");
+    templateList.className = "gfc-template-list";
+    templateListWrap.appendChild(templateList);
+
+    const addBtn = document.createElement("button");
+    addBtn.type = "button";
+    addBtn.className = "gfc-template-add-btn";
+    addBtn.innerText = LangSystem.getText("template_add_btn");
+    templateListWrap.appendChild(addBtn);
+
+    const limitHint = document.createElement("div");
+    limitHint.className = "gfc-template-limit-hint";
+    limitHint.innerText = LangSystem.getText("template_limit_reached");
+    limitHint.style.display = "none";
+    templateListWrap.appendChild(limitHint);
+
+    templateCard.appendChild(templateListWrap);
+
+    const templateCardRefs = [];
+
+    function updateTemplateListUIState() {
+      addBtn.disabled = templateCardRefs.length >= CUSTOM_TEMPLATE_LIMIT;
+      limitHint.style.display = addBtn.disabled ? "block" : "none";
+      emptyHint.style.display = templateCardRefs.length === 0 ? "block" : "none";
+    }
+
+    function renderTemplateCard(tpl) {
+      const card = document.createElement("div");
+      card.className = "gfc-template-card";
+
+      const header = document.createElement("div");
+      header.className = "gfc-template-card-header";
+
+      const enableChk = document.createElement("input");
+      enableChk.type = "checkbox";
+      enableChk.checked = tpl.enabled !== false;
+      enableChk.addEventListener("change", refreshFooterState);
+      header.appendChild(enableChk);
+
+      const nameInput = document.createElement("input");
+      nameInput.type = "text";
+      nameInput.className = "gfc-template-name-input";
+      nameInput.placeholder = LangSystem.getText("template_name_placeholder");
+      nameInput.value = tpl.name || "";
+      nameInput.addEventListener("input", refreshFooterState);
+      header.appendChild(nameInput);
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.type = "button";
+      deleteBtn.className = "gfc-template-delete-btn";
+      deleteBtn.innerText = LangSystem.getText("template_delete_btn");
+      deleteBtn.addEventListener("click", () => {
+        card.remove();
+        const idx = templateCardRefs.findIndex((r) => r.card === card);
+        if (idx !== -1) templateCardRefs.splice(idx, 1);
+        updateTemplateListUIState();
+        refreshFooterState();
+      });
+      header.appendChild(deleteBtn);
+
+      card.appendChild(header);
+
+      const contentTextarea = document.createElement("textarea");
+      contentTextarea.className = "grok-custom-textarea";
+      contentTextarea.placeholder = LangSystem.getText("custom_prompt_placeholder");
+      contentTextarea.value = tpl.content || "";
+      contentTextarea.style.minHeight = "70px";
+      contentTextarea.style.resize = "vertical";
+      contentTextarea.addEventListener("input", refreshFooterState);
+      card.appendChild(contentTextarea);
+
+      templateCardRefs.push({ card, id: tpl.id, enableChk, nameInput, contentTextarea });
+      return card;
+    }
+
+    function collectTemplatesFromUI() {
+      return templateCardRefs.map((ref) => ({
+        id: ref.id,
+        name: ref.nameInput.value.trim(),
+        content: ref.contentTextarea.value.trim(),
+        enabled: ref.enableChk.checked,
+      }));
+    }
+
+    getCustomTemplates().forEach((tpl) => {
+      templateList.appendChild(renderTemplateCard(tpl));
+    });
+    updateTemplateListUIState();
+
+    addBtn.addEventListener("click", () => {
+      if (templateCardRefs.length >= CUSTOM_TEMPLATE_LIMIT) return;
+      const newTpl = { id: "t" + Date.now(), name: "", content: "", enabled: true };
+      templateList.appendChild(renderTemplateCard(newTpl));
+      updateTemplateListUIState();
+      refreshFooterState();
+    });
 
     checkbox.addEventListener("change", () => {
-      textareaWrap.classList.toggle("open", checkbox.checked);
+      templateListWrap.classList.toggle("open", checkbox.checked);
       refreshFooterState();
     });
 
@@ -1264,8 +1501,8 @@
     tabPanes.language.appendChild(customLangCard);
 
     const initialState = {
-      enabled:   GM_getValue("cfg_custom_prompt_enabled", false),
-      prompt:    GM_getValue("cfg_custom_prompt", "").trim(),
+      templatesEnabled: isCustomTemplatesEnabled(),
+      templatesSnapshot: JSON.stringify(getCustomTemplates()),
       highlight: GM_getValue("cfg_highlight_url", false),
       curtain:   GM_getValue("cfg_curtain_enabled", true),
       platforms: GM_getValue("cfg_platforms", '["grok"]'),
@@ -1282,14 +1519,15 @@
       const currentOpenBehavior = JSON.stringify(
         Object.fromEntries(PLATFORM_DEFS.map(p => [p.key, platformOpenSelects[p.key]?.value === "fg"]))
       );
+      const currentTemplatesSnapshot = JSON.stringify(collectTemplatesFromUI());
       return (
-        checkbox.checked      !== initialState.enabled      ||
-        textarea.value.trim() !== initialState.prompt       ||
-        highlightChk.checked  !== initialState.highlight    ||
-        curtainChk.checked    !== initialState.curtain      ||
-        currentPlatforms      !== initialState.platforms    ||
-        selectedLangCode      !== initialState.langCode     ||
-        currentOpenBehavior   !== initialState.openBehavior
+        checkbox.checked          !== initialState.templatesEnabled  ||
+        currentTemplatesSnapshot  !== initialState.templatesSnapshot ||
+        highlightChk.checked      !== initialState.highlight         ||
+        curtainChk.checked        !== initialState.curtain           ||
+        currentPlatforms          !== initialState.platforms         ||
+        selectedLangCode          !== initialState.langCode          ||
+        currentOpenBehavior       !== initialState.openBehavior
       );
     }
 
@@ -1298,8 +1536,9 @@
       if (enabledKeys.length > 0) {
         GM_setValue("cfg_platforms", JSON.stringify(enabledKeys));
       }
-      GM_setValue("cfg_custom_prompt_enabled", checkbox.checked);
-      GM_setValue("cfg_custom_prompt", textarea.value.trim());
+      const templatesToSave = collectTemplatesFromUI();
+      GM_setValue("cfg_custom_templates_enabled", checkbox.checked);
+      GM_setValue("cfg_custom_templates", JSON.stringify(templatesToSave));
       GM_setValue("cfg_highlight_url", highlightChk.checked);
       GM_setValue("cfg_curtain_enabled", curtainChk.checked);
       GM_setValue("cfg_open_behavior", JSON.stringify(
@@ -1314,8 +1553,8 @@
         });
       }
 
-      initialState.enabled      = checkbox.checked;
-      initialState.prompt       = textarea.value.trim();
+      initialState.templatesEnabled  = checkbox.checked;
+      initialState.templatesSnapshot = JSON.stringify(templatesToSave);
       initialState.highlight    = highlightChk.checked;
       initialState.curtain      = curtainChk.checked;
       initialState.platforms    = JSON.stringify(enabledKeys);
@@ -2343,6 +2582,7 @@
   const NEW_FEATURES = {
     open_behavior: "1.6.0",
     curtain_all_platforms: "1.6.3",
+    custom_templates: "1.6.5",
   };
   function isFeatureNew(featureKey) {
     const introducedVersion = NEW_FEATURES[featureKey];
@@ -2394,6 +2634,57 @@
     return ICONS[key.toUpperCase()] || ICONS.ROBOT;
   }
 
+  function showTemplateDropdown(anchorEl, templates, onSelect) {
+    document.querySelector(".gfc-plat-drop")?.remove();
+
+    const rect = anchorEl.getBoundingClientRect();
+    const drop = document.createElement("div");
+    drop.className = "gfc-plat-drop";
+    const dropEstHeight = templates.length * 42 + 16;
+    const showAbove = rect.top > dropEstHeight + 8;
+    drop.style.cssText = showAbove
+      ? `position:fixed;bottom:${window.innerHeight - rect.top + 8}px;left:${Math.max(4, rect.left - 8)}px;`
+      : `position:fixed;top:${rect.bottom + 8}px;left:${Math.max(4, rect.left - 8)}px;box-shadow:0 4px 24px rgba(0,0,0,0.6);`;
+
+    const closeHandler = (e) => {
+      if (!drop.contains(e.target) && e.target !== anchorEl) {
+        drop.remove();
+        document.removeEventListener("click", closeHandler, true);
+      }
+    };
+
+    templates.forEach((tpl) => {
+      const item = document.createElement("button");
+      item.className = "gfc-plat-item";
+
+      const iconEl = document.createElement("span");
+      iconEl.className = "gfc-plat-item-icon";
+      iconEl.style.color = "#1d9bf0";
+      iconEl.style.background = "#1d9bf01A";
+      iconEl.innerHTML = ICONS.TEMPLATE;
+      item.appendChild(iconEl);
+
+      const nameEl = document.createElement("span");
+      nameEl.innerText = tpl.name || (tpl.content || "").slice(0, 12) || "—";
+      item.appendChild(nameEl);
+
+      item.addEventListener("click", (e) => {
+        e.stopPropagation();
+        document.removeEventListener("click", closeHandler, true);
+        drop.classList.add("gfc-drop-fade-out");
+        setTimeout(() => {
+          drop.remove();
+          onSelect(tpl);
+        }, 130);
+      });
+
+      drop.appendChild(item);
+    });
+
+    document.body.appendChild(drop);
+    setTimeout(() => document.addEventListener("click", closeHandler, true), 0);
+  }
+
   function showPlatformDropdown(anchorEl, textOrFn, btnEl, buildPayloadFor) {
     document.querySelector(".gfc-plat-drop")?.remove();
 
@@ -2406,11 +2697,41 @@
 
     const drop = document.createElement("div");
     drop.className = "gfc-plat-drop";
-    const dropEstHeight = platforms.length * 42 + 16;
+    const dropEstHeight = platforms.length * 42 + 16 + 36;
     const showAbove = rect.top > dropEstHeight + 8;
     drop.style.cssText = showAbove
       ? `position:fixed;bottom:${window.innerHeight - rect.top + 8}px;left:${Math.max(4, rect.left - 8)}px;`
       : `position:fixed;top:${rect.bottom + 8}px;left:${Math.max(4, rect.left - 8)}px;box-shadow:0 4px 24px rgba(0,0,0,0.6);`;
+
+    const closeHandler = (e) => {
+      if (!drop.contains(e.target) && e.target !== anchorEl) {
+        drop.remove();
+        document.removeEventListener("click", closeHandler, true);
+      }
+    };
+
+    const header = document.createElement("div");
+    header.className = "gfc-plat-drop-header";
+
+    const titleEl = document.createElement("span");
+    titleEl.className = "gfc-plat-drop-title";
+    titleEl.innerText = LangSystem.getText("platform_select_title");
+    header.appendChild(titleEl);
+
+    const gearBtn = document.createElement("button");
+    gearBtn.type = "button";
+    gearBtn.className = "gfc-plat-gear-btn";
+    gearBtn.title = LangSystem.getText("open_settings_tooltip");
+    gearBtn.innerHTML = ICONS.GEAR;
+    gearBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      document.removeEventListener("click", closeHandler, true);
+      drop.remove();
+      showLanguageSelectionUI("platform");
+    });
+    header.appendChild(gearBtn);
+
+    drop.appendChild(header);
 
     PLATFORM_DEFS.filter(p => platforms.includes(p.key)).forEach(({ key, name, color }) => {
       const item = document.createElement("button");
@@ -2419,6 +2740,7 @@
       const iconEl = document.createElement("span");
       iconEl.className = "gfc-plat-item-icon";
       iconEl.style.color = color;
+      iconEl.style.background = `${color}1A`;
       iconEl.innerHTML = getPlatformIcon(key);
       item.appendChild(iconEl);
 
@@ -2438,13 +2760,6 @@
     });
 
     document.body.appendChild(drop);
-
-    const closeHandler = (e) => {
-      if (!drop.contains(e.target) && e.target !== anchorEl) {
-        drop.remove();
-        document.removeEventListener("click", closeHandler, true);
-      }
-    };
     setTimeout(() => document.addEventListener("click", closeHandler, true), 0);
   }
 
@@ -2507,35 +2822,45 @@
       const url = getUrlFn();
       if (!url) return;
 
-      const currentPrompt = LangSystem.getPrompt();
-      const platforms = getEnabledPlatforms();
-
-      function buildPayloadFor(_platform) {
-        const content = getContentFn ? getContentFn() : "";
-        if (content && content.trim()) {
-          return `${currentPrompt}\n"${content.trim()}"\n\n${url}`;
-        }
-        return `${currentPrompt}${url}`;
-      }
-
       btn.classList.remove("charging");
       btn.style.transition = "all 0.2s";
       btn.style.transform = "scale(1)";
 
-      if (isLongPress) {
-        const target = platforms.includes("grok") ? "grok" : platforms[0];
-        btn.innerHTML = ICONS.SENDING;
-        setTimeout(() => { btn.innerHTML = getPlatformIcon(target); }, 2000);
-        const tabUrl = await buildTabUrl(target, buildPayloadFor(target), true);
-        if (tabUrl) GM_openInTab(tabUrl, { active: getOpenBehavior(target) });
-      } else if (platforms.length === 1) {
-        const platform = platforms[0];
-        btn.innerHTML = ICONS.SENDING;
-        setTimeout(() => { btn.innerHTML = getPlatformIcon(platform); }, 2000);
-        const tabUrl = await buildTabUrl(platform, buildPayloadFor(platform), false);
-        if (tabUrl) GM_openInTab(tabUrl, { active: getOpenBehavior(platform) });
+      async function proceedWithPrompt(currentPrompt) {
+        const platforms = getEnabledPlatforms();
+
+        function buildPayloadFor(_platform) {
+          const content = getContentFn ? getContentFn() : "";
+          if (content && content.trim()) {
+            return `${currentPrompt}\n"${content.trim()}"\n\n${url}`;
+          }
+          return `${currentPrompt}${url}`;
+        }
+
+        if (isLongPress) {
+          const target = platforms.includes("grok") ? "grok" : platforms[0];
+          btn.innerHTML = ICONS.SENDING;
+          setTimeout(() => { btn.innerHTML = getPlatformIcon(target); }, 2000);
+          const tabUrl = await buildTabUrl(target, buildPayloadFor(target), true);
+          if (tabUrl) GM_openInTab(tabUrl, { active: getOpenBehavior(target) });
+        } else if (platforms.length === 1) {
+          const platform = platforms[0];
+          btn.innerHTML = ICONS.SENDING;
+          setTimeout(() => { btn.innerHTML = getPlatformIcon(platform); }, 2000);
+          const tabUrl = await buildTabUrl(platform, buildPayloadFor(platform), false);
+          if (tabUrl) GM_openInTab(tabUrl, { active: getOpenBehavior(platform) });
+        } else {
+          showPlatformDropdown(btn, url, btn, buildPayloadFor);
+        }
+      }
+
+      const enabledTemplates = getEnabledTemplates();
+      if (enabledTemplates.length >= 2) {
+        showTemplateDropdown(btn, enabledTemplates, (selectedTpl) => {
+          proceedWithPrompt(LangSystem.getPrompt(selectedTpl.content));
+        });
       } else {
-        showPlatformDropdown(btn, url, btn, buildPayloadFor);
+        proceedWithPrompt(LangSystem.getPrompt());
       }
     });
     return btn;
