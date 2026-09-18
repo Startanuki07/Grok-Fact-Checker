@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.6.5.0
+// @version      1.6.5.5
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -922,6 +922,12 @@
             background: #f4212e; flex-shrink: 0; pointer-events: none;
             animation: gfc-new-pulse 1.6s ease-in-out infinite;
         }
+        
+        .gfc-new-badge-pill {
+            display: inline-block; padding: 1px 6px; border-radius: 4px;
+            background: #f4212e; color: #fff; font-size: 10px; font-weight: 700;
+            line-height: 1.5; vertical-align: middle; flex-shrink: 0; pointer-events: none;
+        }
 
         .gfc-lang-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
@@ -976,7 +982,7 @@
         .gfc-plat-gear-btn {
             background: transparent; border: none; color: #8899a6; cursor: pointer;
             width: 24px; height: 24px; border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; padding: 0;
+            align-items: center; justify-content: center; padding: 0; position: relative;
             transition: background 0.15s, color 0.15s, transform 0.3s; flex-shrink: 0;
         }
         .gfc-plat-gear-btn:hover { background: rgba(255,255,255,0.1); color: #e7e9ea; transform: rotate(45deg); }
@@ -1147,16 +1153,6 @@
       tabBtn.className = "gfc-tab-btn";
       if (key === initialTab) tabBtn.classList.add("active");
       tabBtn.innerHTML = `<span class="gfc-tab-icon">${icon}</span><span>${LangSystem.getText(labelKey)}</span>`;
-      if (key === "platform" && isFeatureNew("open_behavior")) {
-        const badge = document.createElement("span");
-        badge.className = "gfc-new-badge";
-        tabBtn.appendChild(badge);
-      }
-      if (key === "template" && isFeatureNew("custom_templates")) {
-        const badge = document.createElement("span");
-        badge.className = "gfc-new-badge";
-        tabBtn.appendChild(badge);
-      }
       tabBtn.onclick = () => switchTab(key);
       tabBar.appendChild(tabBtn);
       tabBtns[key] = tabBtn;
@@ -1180,22 +1176,6 @@
       currentTab = key;
       Object.entries(tabBtns).forEach(([k, el]) => el.classList.toggle("active", k === key));
       Object.entries(tabPanes).forEach(([k, el]) => el.classList.toggle("active", k === key));
-      if (key === "platform" && isFeatureNew("open_behavior")) {
-        markFeatureSeen("open_behavior");
-        tabBtns.platform.querySelector(".gfc-new-badge")?.remove();
-      }
-      if (key === "template" && isFeatureNew("custom_templates")) {
-        markFeatureSeen("custom_templates");
-        tabBtns.template.querySelector(".gfc-new-badge")?.remove();
-      }
-    }
-    if (initialTab === "platform" && isFeatureNew("open_behavior")) {
-      markFeatureSeen("open_behavior");
-      tabBtns.platform.querySelector(".gfc-new-badge")?.remove();
-    }
-    if (initialTab === "template" && isFeatureNew("custom_templates")) {
-      markFeatureSeen("custom_templates");
-      tabBtns.template.querySelector(".gfc-new-badge")?.remove();
     }
 
     const templateCard = document.createElement("div");
@@ -1203,7 +1183,16 @@
 
     const customLabel = document.createElement("div");
     customLabel.className = "gfc-card-title";
-    customLabel.innerText = LangSystem.getText("custom_prompt_section");
+    const customLabelText = document.createElement("span");
+    customLabelText.textContent = LangSystem.getText("custom_prompt_section");
+    customLabel.appendChild(customLabelText);
+    let templateNewBadge = null;
+    if (isFeatureNew("custom_templates")) {
+      templateNewBadge = document.createElement("span");
+      templateNewBadge.className = "gfc-new-badge-pill";
+      templateNewBadge.textContent = "New";
+      customLabel.appendChild(templateNewBadge);
+    }
     templateCard.appendChild(customLabel);
 
     const checkRow = document.createElement("label");
@@ -1211,6 +1200,13 @@
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = isCustomTemplatesEnabled();
+    if (templateNewBadge) {
+      checkbox.addEventListener("change", () => {
+        markFeatureSeen("custom_templates");
+        templateNewBadge.remove();
+        templateNewBadge = null;
+      }, { once: true });
+    }
     const checkLabel = document.createElement("span");
     checkLabel.innerText = LangSystem.getText("custom_prompt_checkbox");
     checkRow.appendChild(checkbox);
@@ -1355,30 +1351,6 @@
     highlightChk.addEventListener("change", refreshFooterState);
     tabPanes.template.appendChild(highlightCard);
 
-    const curtainCard = document.createElement("div");
-    curtainCard.className = "gfc-card";
-    const curtainRow = document.createElement("label");
-    curtainRow.className = "grok-custom-checkbox-row";
-    const curtainChk = document.createElement("input");
-    curtainChk.type = "checkbox";
-    curtainChk.checked = GM_getValue("cfg_curtain_enabled", true);
-    const curtainLabel = document.createElement("span");
-    curtainLabel.innerText = LangSystem.getText("curtain_animation_checkbox");
-    curtainRow.appendChild(curtainChk);
-    curtainRow.appendChild(curtainLabel);
-    if (isFeatureNew("curtain_all_platforms")) {
-      const curtainBadge = document.createElement("span");
-      curtainBadge.className = "gfc-new-badge-inline";
-      curtainRow.appendChild(curtainBadge);
-      curtainChk.addEventListener("change", () => {
-        markFeatureSeen("curtain_all_platforms");
-        curtainBadge.remove();
-      }, { once: true });
-    }
-    curtainCard.appendChild(curtainRow);
-    curtainChk.addEventListener("change", refreshFooterState);
-    tabPanes.template.appendChild(curtainCard);
-
     const platformCard = document.createElement("div");
     platformCard.className = "gfc-card";
     const platformLabel = document.createElement("div");
@@ -1454,6 +1426,21 @@
     updateHighlightNote();
 
     tabPanes.platform.appendChild(platformCard);
+
+    const curtainCard = document.createElement("div");
+    curtainCard.className = "gfc-card";
+    const curtainRow = document.createElement("label");
+    curtainRow.className = "grok-custom-checkbox-row";
+    const curtainChk = document.createElement("input");
+    curtainChk.type = "checkbox";
+    curtainChk.checked = GM_getValue("cfg_curtain_enabled", true);
+    const curtainLabel = document.createElement("span");
+    curtainLabel.innerText = LangSystem.getText("curtain_animation_checkbox");
+    curtainRow.appendChild(curtainChk);
+    curtainRow.appendChild(curtainLabel);
+    curtainCard.appendChild(curtainRow);
+    curtainChk.addEventListener("change", refreshFooterState);
+    tabPanes.platform.appendChild(curtainCard);
 
     const langCard = document.createElement("div");
     langCard.className = "gfc-card";
@@ -2580,9 +2567,7 @@
   }
 
   const NEW_FEATURES = {
-    open_behavior: "1.6.0",
-    curtain_all_platforms: "1.6.3",
-    custom_templates: "1.6.5",
+    custom_templates: "1.6.5.5",
   };
   function isFeatureNew(featureKey) {
     const introducedVersion = NEW_FEATURES[featureKey];
@@ -2594,6 +2579,20 @@
     const introducedVersion = NEW_FEATURES[featureKey];
     if (!introducedVersion) return;
     GM_setValue(`cfg_feature_seen_${featureKey}`, introducedVersion);
+  }
+  function getUnseenFeatureKeys() {
+    return Object.keys(NEW_FEATURES).filter(isFeatureNew);
+  }
+  function getUnseenSignature() {
+    return getUnseenFeatureKeys().sort().join(",");
+  }
+  function hasUnseenGearIndicator() {
+    const sig = getUnseenSignature();
+    if (!sig) return false;
+    return GM_getValue("cfg_gear_badge_seen_sig", "") !== sig;
+  }
+  function markGearIndicatorSeen() {
+    GM_setValue("cfg_gear_badge_seen_sig", getUnseenSignature());
   }
 
   async function buildTabUrl(platform, text, forceSend) {
@@ -2723,10 +2722,16 @@
     gearBtn.className = "gfc-plat-gear-btn";
     gearBtn.title = LangSystem.getText("open_settings_tooltip");
     gearBtn.innerHTML = ICONS.GEAR;
+    if (hasUnseenGearIndicator()) {
+      const gearBadge = document.createElement("span");
+      gearBadge.className = "gfc-new-badge";
+      gearBtn.appendChild(gearBadge);
+    }
     gearBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       document.removeEventListener("click", closeHandler, true);
       drop.remove();
+      markGearIndicatorSeen();
       showLanguageSelectionUI("platform");
     });
     header.appendChild(gearBtn);
