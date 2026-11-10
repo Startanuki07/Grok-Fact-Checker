@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.6.5.11
+// @version      1.6.5.13
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -1105,8 +1105,6 @@
     curtainElement.appendChild(curtainMsgElement);
     curtainElement.appendChild(curtainSubElement);
     document.body.appendChild(curtainElement);
-
-    setTimeout(() => hideCurtain(0), 1800);
   }
 
   function updateCurtainText(text, sub = null) {
@@ -2014,32 +2012,29 @@
     return null;
   }
 
-  function fillGrokEditor(editor, text, onFilled) {
-    editor.focus();
-    document.execCommand("selectAll", false, null);
-    document.execCommand("delete", false, null);
-
-    let pasteOk = false;
+  function fillGrokEditor(editor, text) {
+    const lexicalEditor = editor && editor.__lexicalEditor;
+    if (!lexicalEditor) return false;
+    const textNode = (t) => ({
+      detail: 0, format: 0, mode: "normal", style: "", text: t, type: "text", version: 1,
+    });
+    const paragraphNode = (children) => ({
+      children, direction: null, format: "", indent: 0,
+      textFormat: 0, textStyle: "", type: "paragraph", version: 1,
+    });
+    const paragraphs = String(text)
+      .split(/\r\n|\r|\n/)
+      .map((line) => paragraphNode(line.length === 0 ? [] : [textNode(line)]));
+    const stateJSON = {
+      root: { children: paragraphs, direction: null, format: "", indent: 0, type: "root", version: 1 },
+    };
     try {
-      const dt = new DataTransfer();
-      dt.setData("text/plain", text);
-      const ev = new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true });
-      editor.dispatchEvent(ev);
-      pasteOk = true;
+      lexicalEditor.setEditorState(lexicalEditor.parseEditorState(JSON.stringify(stateJSON)));
+      return true;
     } catch (e) {
-      console.warn("[GrokCheck] fillGrokEditor ClipboardEvent paste 失敗：", e);
+      console.warn("[GrokCheck] fillGrokEditor setEditorState 失敗：", e);
+      return false;
     }
-
-    setTimeout(() => {
-      const expectedLen = text.replace(/\n/g, "").trim().length;
-      const filled = editor.innerText?.replace(/\n/g, "").trim();
-      if (!pasteOk || !filled || filled.length < expectedLen - 5) {
-        editor.focus();
-        document.execCommand("selectAll", false, null);
-        document.execCommand("insertText", false, text);
-      }
-      if (typeof onFilled === "function") onFilled();
-    }, 300);
   }
 
   let _automationRunning = false;
@@ -2071,6 +2066,24 @@
     const BTN_RETRY_LIMIT = 12;
     let hasClickedPrivacy = false;
     let hasClickedFocus = false;
+
+    function findGrokComposer() {
+      return findAny([
+        'textarea[placeholder*="Grok"]',
+        'textarea[aria-label*="Grok"]',
+        'textarea[data-testid="grok-input"]',
+        "textarea:not(.grok-custom-textarea)",
+      ]) || (() => {
+        const candidates = document.querySelectorAll(
+          'div[contenteditable="true"][data-lexical-editor="true"], div[contenteditable="true"][aria-label="Ask anything"]',
+        );
+        for (const el of candidates) {
+          if (el.closest(".hidden")) continue;
+          return el;
+        }
+        return null;
+      })();
+    }
 
     const interval = setInterval(() => {
       try {
@@ -2125,22 +2138,8 @@
 
         if (!hasClickedPrivacy || !hasClickedFocus) return;
 
-        const textarea = findAny([
-          'textarea[placeholder*="Grok"]',
-          'textarea[aria-label*="Grok"]',
-          'textarea[data-testid="grok-input"]',
-          "textarea:not(.grok-custom-textarea)",
-        ]) || (() => {
-          const candidates = document.querySelectorAll(
-            'div[contenteditable="true"][data-lexical-editor="true"], div[contenteditable="true"][aria-label="Ask anything"]',
-          );
-          for (const el of candidates) {
-            if (el.closest(".hidden")) continue;
-            return el;
-          }
-          return null;
-        })();
-        const isEditable = !!(textarea && textarea.tagName !== "TEXTAREA");
+        let textarea = findGrokComposer();
+        let isEditable = !!(textarea && textarea.tagName !== "TEXTAREA");
 
         if (textarea && payload) {
           clearInterval(interval);
@@ -2216,14 +2215,29 @@
             });
           };
 
+          const fillDelay = isEditable ? 500 : 0;
           setTimeout(() => {
+            if (!textarea.isConnected) {
+              const refreshed = findGrokComposer();
+              if (!refreshed) {
+                updateCurtainText(LangSystem.getText("error_timeout"), LangSystem.getText("error_timeout_sub"));
+                cleanup();
+                return;
+              }
+              textarea = refreshed;
+              isEditable = !!(textarea && textarea.tagName !== "TEXTAREA");
+            }
             if (isEditable) {
-              fillGrokEditor(textarea, payload, afterFilled);
+              if (fillGrokEditor(textarea, payload)) afterFilled();
+              else {
+                updateCurtainText(LangSystem.getText("error_timeout"), LangSystem.getText("error_timeout_sub"));
+                cleanup();
+              }
             } else {
               simulateTypeInput(textarea, payload);
               afterFilled();
             }
-          }, 500);
+          }, fillDelay);
 
         } else if (attempts >= maxAttempts) {
           updateCurtainText(LangSystem.getText("error_timeout"), LangSystem.getText("error_timeout_sub"));
