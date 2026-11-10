@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.6.5.5
+// @version      1.6.5.11
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -32,6 +32,7 @@
 // @grant        GM_registerMenuCommand
 // @grant        GM_addStyle
 // @run-at       document-end
+// @noframes
 // @description      Adds a 🤖 fact-check button next to posts on X (Twitter), Threads, Bluesky, and Mastodon. Choose from Grok, ChatGPT, Gemini, or Meta AI to check a post's claims in one click. Best suited for users who occasionally encounter unfamiliar news or claims and want a quick, discreet way to verify them.
 // @description:zh-TW 在 X (Twitter)、Threads、Bluesky 與 Mastodon 的貼文旁加入 🤖 查核按鈕，可選擇 Grok、ChatGPT、Gemini 或 Meta AI，一鍵查核貼文內容。適合偶爾看到不確定的資訊、想低調快速查核的一般用戶。
 // @description:zh-CN 在 X (Twitter)、Threads、Bluesky 与 Mastodon 的帖子旁添加 🤖 核查按钮，可选择 Grok、ChatGPT、Gemini 或 Meta AI，一键核查帖子内容。适合偶尔遇到存疑信息、想低调快速核查的普通用户。
@@ -48,6 +49,38 @@
   const escapeHtmlText = s => String(s)
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+
+  const _ttPolicy = (() => {
+    if (typeof trustedTypes === "undefined" || !trustedTypes.createPolicy) return null;
+    try { return trustedTypes.createPolicy("grok-fact-checker-html", { createHTML: (s) => s }); }
+    catch (_) { return null; }
+  })();
+  const setHTML = (el, val) => { el.innerHTML = _ttPolicy ? _ttPolicy.createHTML(val) : val; };
+
+  const detectBrowserLang = () => {
+    const tag = String(navigator.language || "").toLowerCase();
+    if (/zh-hant|zh-tw|zh-hk|zh-mo/.test(tag)) return "zh-TW";
+    const base = tag.split("-")[0];
+    if (base === "zh") return "zh-CN";
+    if (base === "ja") return "ja";
+    if (base === "ko") return "ko";
+    if (base === "pt") return "pt-BR";
+    if (base === "fr") return "fr";
+    if (base === "es") return "es";
+    return "en";
+  };
+
+  const makeFrameThrottled = (fn) => {
+    let queued = false;
+    return () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        try { fn(); } catch (e) { console.warn("[GFC] throttled task error:", e); }
+      });
+    };
+  };
 
   const LANG_DICT = {
     "zh-TW": {
@@ -621,22 +654,14 @@
       const code = LangSystem.getKey();
       if (code && LANG_DICT[code]) return LANG_DICT[code];
 
-      const browserLang = navigator.language.toLowerCase();
-      if (browserLang.includes("zh-cn") || browserLang.includes("zh-hans")) return LANG_DICT["zh-CN"];
-      if (browserLang.includes("zh")) return LANG_DICT["zh-TW"];
-      if (browserLang.includes("ja")) return LANG_DICT["ja"];
-      if (browserLang.includes("ko")) return LANG_DICT["ko"];
-      if (browserLang.includes("pt")) return LANG_DICT["pt-BR"];
-      if (browserLang.includes("fr")) return LANG_DICT["fr"];
-      if (browserLang.includes("es")) return LANG_DICT["es"];
-      if (browserLang.includes("en")) return LANG_DICT["en"];
-
-      return LANG_DICT["en"];
+      return LANG_DICT[detectBrowserLang()] || LANG_DICT["en"];
     },
 
     getText: (key) => {
       const dict = LangSystem.getCurrent();
-      return dict.ui[key] || LANG_DICT["zh-TW"].ui[key] || key;
+      const v = dict.ui && dict.ui[key];
+      if (typeof v === "string" && v) return v;
+      return LANG_DICT["en"].ui[key] || key;
     },
 
     getPrompt: (templateContent) => {
@@ -739,7 +764,6 @@
         .my-grok-robot-btn:hover { background-color: rgba(29, 155, 240, 0.1); color: rgb(29, 155, 240); }
         .my-grok-robot-btn.charging { color: #f91880; background-color: rgba(249, 24, 128, 0.1); transform: scale(1.15); }
         .my-grok-robot-btn svg { width: 20px; height: 20px; }
-        
         .my-grok-robot-btn.tm-native-sized { width: auto !important; height: auto !important; }
 
         .grok-curtain-overlay {
@@ -916,13 +940,11 @@
             0%, 100% { box-shadow: 0 0 0 0 rgba(244,33,46,0.5); }
             50%      { box-shadow: 0 0 0 4px rgba(244,33,46,0); }
         }
-        
         .gfc-new-badge-inline {
             display: inline-block; width: 8px; height: 8px; border-radius: 50%;
             background: #f4212e; flex-shrink: 0; pointer-events: none;
             animation: gfc-new-pulse 1.6s ease-in-out infinite;
         }
-        
         .gfc-new-badge-pill {
             display: inline-block; padding: 1px 6px; border-radius: 4px;
             background: #f4212e; color: #fff; font-size: 10px; font-weight: 700;
@@ -969,7 +991,6 @@
             from { opacity: 1; transform: translateY(0)  translateZ(0); }
             to   { opacity: 0; transform: translateY(-4px) translateZ(0); }
         }
-        
         .gfc-plat-drop-header {
             display: flex; align-items: center; justify-content: space-between;
             padding: 4px 6px 8px 8px; margin-bottom: 4px;
@@ -995,7 +1016,6 @@
             width: 100%; text-align: left;
         }
         .gfc-plat-item:hover { background: rgba(255,255,255,0.08); }
-        
         .gfc-plat-item:not(:last-child) {
             margin-bottom: 5px;
             position: relative;
@@ -1004,7 +1024,6 @@
             content: ""; position: absolute; left: 8px; right: 8px; bottom: -3px;
             height: 1px; background: rgba(255,255,255,0.08);
         }
-        
         .gfc-plat-item-icon {
             width: 28px; height: 28px; display: inline-flex; align-items: center;
             justify-content: center; flex-shrink: 0; border-radius: 8px;
@@ -1052,15 +1071,13 @@
       "grok.com",
       "Get more with grok.com",
     ];
-    const candidates = document.querySelectorAll('span, div[dir="ltr"]');
-    candidates.forEach((el) => {
-      if (!el.innerText) return;
-      if (keywords.some((kw) => el.innerText.includes(kw))) {
-        const btn = el.closest("button");
-        if (btn && !_adsHidden.has(btn)) {
-          btn.style.display = "none";
-          _adsHidden.add(btn);
-        }
+    document.querySelectorAll("button").forEach((btn) => {
+      if (_adsHidden.has(btn)) return;
+      const text = btn.textContent;
+      if (!text || text.length > 200) return;
+      if (keywords.some((kw) => text.includes(kw))) {
+        btn.style.display = "none";
+        _adsHidden.add(btn);
       }
     });
   }
@@ -1135,7 +1152,7 @@
     header.appendChild(title);
     const headerCloseBtn = document.createElement("button");
     headerCloseBtn.className = "gfc-panel-close";
-    headerCloseBtn.innerHTML = "✕";
+    headerCloseBtn.textContent = "✕";
     headerCloseBtn.title = LangSystem.getText("close_btn");
     header.appendChild(headerCloseBtn);
     panel.appendChild(header);
@@ -1152,7 +1169,13 @@
       const tabBtn = document.createElement("button");
       tabBtn.className = "gfc-tab-btn";
       if (key === initialTab) tabBtn.classList.add("active");
-      tabBtn.innerHTML = `<span class="gfc-tab-icon">${icon}</span><span>${LangSystem.getText(labelKey)}</span>`;
+      const tabIconEl = document.createElement("span");
+      tabIconEl.className = "gfc-tab-icon";
+      tabIconEl.textContent = icon;
+      const tabLabelEl = document.createElement("span");
+      tabLabelEl.textContent = LangSystem.getText(labelKey);
+      tabBtn.appendChild(tabIconEl);
+      tabBtn.appendChild(tabLabelEl);
       tabBtn.onclick = () => switchTab(key);
       tabBar.appendChild(tabBtn);
       tabBtns[key] = tabBtn;
@@ -1201,11 +1224,10 @@
     checkbox.type = "checkbox";
     checkbox.checked = isCustomTemplatesEnabled();
     if (templateNewBadge) {
-      checkbox.addEventListener("change", () => {
+      templateCard.addEventListener("click", () => {
         markFeatureSeen("custom_templates");
-        templateNewBadge.remove();
-        templateNewBadge = null;
-      }, { once: true });
+        if (templateNewBadge) { templateNewBadge.remove(); templateNewBadge = null; }
+      }, { once: true, capture: true });
     }
     const checkLabel = document.createElement("span");
     checkLabel.innerText = LangSystem.getText("custom_prompt_checkbox");
@@ -1373,7 +1395,7 @@
 
       const iconEl = document.createElement("span");
       iconEl.style.cssText = `width:16px;height:16px;display:inline-flex;align-items:center;flex-shrink:0;color:${PLAT_COLORS[key]};`;
-      iconEl.innerHTML = getPlatformIcon(key);
+      setHTML(iconEl, getPlatformIcon(key));
 
       const nameEl = document.createElement("span");
       nameEl.innerText = key === "meta" ? `${name} (${LangSystem.getText("meta_login_notice")})` : name;
@@ -1450,17 +1472,7 @@
     langCard.appendChild(langLabel);
 
     const currentCode = GM_getValue("cfg_lang_code", null);
-    const initialLangCode = currentCode || (() => {
-      const navLang = navigator.language.toLowerCase();
-      if (navLang.includes("zh-hant") || navLang.includes("zh-tw") || navLang.includes("zh-hk")) return "zh-TW";
-      if (navLang.includes("zh-hans") || navLang.includes("zh-cn") || navLang.includes("zh")) return "zh-CN";
-      if (navLang.includes("ja")) return "ja";
-      if (navLang.includes("ko")) return "ko";
-      if (navLang.includes("pt")) return "pt-BR";
-      if (navLang.includes("fr")) return "fr";
-      if (navLang.includes("es")) return "es";
-      return "en";
-    })();
+    const initialLangCode = currentCode || detectBrowserLang();
     let selectedLangCode = initialLangCode;
     LangSystem._syncCustomIntoDict();
     const langGrid = document.createElement("div");
@@ -1544,7 +1556,7 @@
       initialState.templatesSnapshot = JSON.stringify(templatesToSave);
       initialState.highlight    = highlightChk.checked;
       initialState.curtain      = curtainChk.checked;
-      initialState.platforms    = JSON.stringify(enabledKeys);
+      if (enabledKeys.length > 0) initialState.platforms = JSON.stringify(enabledKeys);
       initialState.langCode     = selectedLangCode;
       initialState.openBehavior = JSON.stringify(
         Object.fromEntries(PLATFORM_DEFS.map(p => [p.key, platformOpenSelects[p.key]?.value === "fg"]))
@@ -1820,24 +1832,31 @@
         }
         try {
           const parsed = JSON.parse(raw);
-          if (!parsed.ui || typeof parsed.ui !== "object") {
+          if (!parsed.ui || typeof parsed.ui !== "object" || Array.isArray(parsed.ui)) {
             errMsg.innerText = "\u274c Invalid format: missing \"ui\" object.";
             errMsg.style.display = "block";
             return;
           }
-          if (typeof parsed.prompt !== "string") {
+          if (typeof parsed.prompt !== "string" || !parsed.prompt.trim()) {
             errMsg.innerText = "\u274c Invalid format: missing \"prompt\" string.";
             errMsg.style.display = "block";
             return;
           }
+          const badUiKey = Object.keys(parsed.ui).find((k) => typeof parsed.ui[k] !== "string");
+          if (badUiKey) {
+            errMsg.innerText = "\u274c Invalid format: \"ui." + badUiKey + "\" must be a string.";
+            errMsg.style.display = "block";
+            return;
+          }
+          const importedLangName = String(parsed.langName || "Custom");
           GM_setValue("cfg_custom_lang", JSON.stringify({
-            langName: parsed.langName || "Custom",
+            langName: importedLangName,
             prompt:   parsed.prompt,
             ui:       parsed.ui,
           }));
           LangSystem.setKey("custom");
           if (statusRowRef) {
-            statusRowRef.innerText = "Loaded: " + (parsed.langName || "Custom");
+            statusRowRef.innerText = "Loaded: " + importedLangName;
             statusRowRef.style.color = "#00ba7c";
           }
           applyBtn.innerText = "\u2705 Applied!";
@@ -1916,6 +1935,22 @@
     );
   }
 
+  function safeSendClick(btn, textarea, isEditable = false) {
+    btn.focus();
+    btn.click();
+    setTimeout(() => {
+      const text = textarea && textarea.isConnected
+        ? (isEditable ? textarea.innerText : textarea.value)
+        : "";
+      const stillFilled = text && text.trim();
+      if (!stillFilled) return;
+      const retryBtn = findSendButton();
+      if (retryBtn && !retryBtn.disabled && retryBtn.getAttribute("aria-disabled") !== "true") {
+        retryBtn.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+      }
+    }, 600);
+  }
+
   function findSendButton() {
     const selectors = [
       'button[aria-label="問 Grok 一些問題"]',
@@ -1977,6 +2012,34 @@
       if (btn) return btn;
     }
     return null;
+  }
+
+  function fillGrokEditor(editor, text, onFilled) {
+    editor.focus();
+    document.execCommand("selectAll", false, null);
+    document.execCommand("delete", false, null);
+
+    let pasteOk = false;
+    try {
+      const dt = new DataTransfer();
+      dt.setData("text/plain", text);
+      const ev = new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true });
+      editor.dispatchEvent(ev);
+      pasteOk = true;
+    } catch (e) {
+      console.warn("[GrokCheck] fillGrokEditor ClipboardEvent paste 失敗：", e);
+    }
+
+    setTimeout(() => {
+      const expectedLen = text.replace(/\n/g, "").trim().length;
+      const filled = editor.innerText?.replace(/\n/g, "").trim();
+      if (!pasteOk || !filled || filled.length < expectedLen - 5) {
+        editor.focus();
+        document.execCommand("selectAll", false, null);
+        document.execCommand("insertText", false, text);
+      }
+      if (typeof onFilled === "function") onFilled();
+    }, 300);
   }
 
   let _automationRunning = false;
@@ -2066,15 +2129,24 @@
           'textarea[placeholder*="Grok"]',
           'textarea[aria-label*="Grok"]',
           'textarea[data-testid="grok-input"]',
-          "textarea",
-        ]);
+          "textarea:not(.grok-custom-textarea)",
+        ]) || (() => {
+          const candidates = document.querySelectorAll(
+            'div[contenteditable="true"][data-lexical-editor="true"], div[contenteditable="true"][aria-label="Ask anything"]',
+          );
+          for (const el of candidates) {
+            if (el.closest(".hidden")) continue;
+            return el;
+          }
+          return null;
+        })();
+        const isEditable = !!(textarea && textarea.tagName !== "TEXTAREA");
 
         if (textarea && payload) {
           clearInterval(interval);
           updateCurtainText(LangSystem.getText("writing"), statusTitle);
 
-          setTimeout(() => {
-            simulateTypeInput(textarea, payload);
+          const afterFilled = () => {
 
             const highlightDone = waitForHighlight((finish) => {
               if (!GM_getValue("cfg_highlight_url", false)) return finish();
@@ -2083,8 +2155,12 @@
               requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                   try {
-                    textarea.focus();
-                    textarea.setSelectionRange(urlStart, payload.length);
+                    if (isEditable) {
+                      highlightUrlInContenteditable(textarea, payload, payload.slice(urlStart));
+                    } else {
+                      textarea.focus();
+                      textarea.setSelectionRange(urlStart, payload.length);
+                    }
                   } catch (e) {}
                   finish();
                 });
@@ -2103,12 +2179,13 @@
                   sendFired = true;
                   sendObs.disconnect();
                   clearTimeout(sendFallback);
-                  if (!textarea.value) {
-                    simulateTypeInput(textarea, payload);
+                  const currentText = isEditable ? textarea.innerText : textarea.value;
+                  if (!currentText) {
+                    if (isEditable) fillGrokEditor(textarea, payload); else simulateTypeInput(textarea, payload);
                   }
                   const btn = findSendButton();
                   if (btn) {
-                    safeSimulateClick(btn);
+                    safeSendClick(btn, textarea, isEditable);
                     updateCurtainText(LangSystem.getText("done"));
                   } else {
                     updateCurtainText(LangSystem.getText("error_btn"), LangSystem.getText("error_btn_sub"));
@@ -2137,6 +2214,15 @@
                 cleanup();
               }
             });
+          };
+
+          setTimeout(() => {
+            if (isEditable) {
+              fillGrokEditor(textarea, payload, afterFilled);
+            } else {
+              simulateTypeInput(textarea, payload);
+              afterFilled();
+            }
           }, 500);
 
         } else if (attempts >= maxAttempts) {
@@ -2233,22 +2319,7 @@
         hideCurtain();
         return;
       }
-      updateCurtainText(LangSystem.getText("sending"));
-      let sendAttempts = 0;
-      const sendInterval = setInterval(() => {
-        sendAttempts++;
-        const btn = findMetaSendBtn();
-        if (btn && !btn.disabled && btn.getAttribute("aria-disabled") !== "true") {
-          clearInterval(sendInterval);
-          btn.click();
-          updateCurtainText(LangSystem.getText("done"));
-          hideCurtain(800);
-        } else if (sendAttempts >= 40) {
-          clearInterval(sendInterval);
-          updateCurtainText(LangSystem.getText("error_btn"), LangSystem.getText("error_btn_sub"));
-          hideCurtain(800);
-        }
-      }, 400);
+      pollAndClickSend(findMetaSendBtn);
     }
 
     let attempts = 0;
@@ -2268,11 +2339,13 @@
     }, 400);
   }
 
-  function runChatGPTAutomation(forceSend, payload) {
+  function runChatGPTAutomation(payload, forceSend) {
     if (!payload) return;
     showCurtain(LangSystem.getText("init"), forceSend ? LangSystem.getText("mode_direct") : LangSystem.getText("mode_std"));
 
+    let submitWatcherArmed = false;
     (function watchAndClearAfterSubmit() {
+      let stablePolls = 0;
       let btnExistedLastPoll = null;
       let textAtSubmit = null;
       let pendingChecks = 0;
@@ -2284,10 +2357,11 @@
         const btnExists = !!btn;
 
         if (textAtSubmit === null) {
-          if (btnExistedLastPoll === true && btnExists === false && editor) {
+          if (submitWatcherArmed && stablePolls >= 2 && btnExistedLastPoll === true && btnExists === false && editor) {
             textAtSubmit = editor.innerText;
             pendingChecks = 0;
           }
+          stablePolls = btnExists ? stablePolls + 1 : 0;
           btnExistedLastPoll = btnExists;
         } else {
           pendingChecks++;
@@ -2301,7 +2375,7 @@
           }
         }
 
-        if (attempts >= 60) clearInterval(pollInterval);
+        if (attempts >= 120) clearInterval(pollInterval);
       }, 500);
     })();
 
@@ -2335,22 +2409,7 @@
         hideCurtain();
         return;
       }
-      updateCurtainText(LangSystem.getText("sending"));
-      let sendAttempts = 0;
-      const sendInterval = setInterval(() => {
-        sendAttempts++;
-        const btn = findChatGPTSendBtn();
-        if (btn && !btn.disabled && btn.getAttribute("aria-disabled") !== "true") {
-          clearInterval(sendInterval);
-          btn.click();
-          updateCurtainText(LangSystem.getText("done"));
-          hideCurtain(800);
-        } else if (sendAttempts >= 40) {
-          clearInterval(sendInterval);
-          updateCurtainText(LangSystem.getText("error_btn"), LangSystem.getText("error_btn_sub"));
-          hideCurtain(800);
-        }
-      }, 400);
+      pollAndClickSend(findChatGPTSendBtn);
     }
 
     function startHighlightWatch() {
@@ -2379,7 +2438,10 @@
       }, 9500);
     }
 
-    startHighlightWatch().then(startAutoSend);
+    startHighlightWatch().then(() => {
+      submitWatcherArmed = true;
+      startAutoSend();
+    });
   }
 
   function runGeminiAutomation(payload, forceSend) {
@@ -2488,6 +2550,25 @@
     }, 400);
   }
 
+  function pollAndClickSend(findBtn) {
+    updateCurtainText(LangSystem.getText("sending"));
+    let sendAttempts = 0;
+    const sendInterval = setInterval(() => {
+      sendAttempts++;
+      const btn = findBtn();
+      if (btn && !btn.disabled && btn.getAttribute("aria-disabled") !== "true") {
+        clearInterval(sendInterval);
+        btn.click();
+        updateCurtainText(LangSystem.getText("done"));
+        hideCurtain(800);
+      } else if (sendAttempts >= 40) {
+        clearInterval(sendInterval);
+        updateCurtainText(LangSystem.getText("error_btn"), LangSystem.getText("error_btn_sub"));
+        hideCurtain(800);
+      }
+    }, 400);
+  }
+
   function waitForHighlight(runHighlight, timeoutMs) {
     return new Promise((resolve) => {
       let done = false;
@@ -2505,7 +2586,7 @@
     });
   }
 
-  function highlightUrlInContenteditable(editor, fullText, targetSubstring) {
+  function highlightUrlInContenteditable(editor, _fullText, targetSubstring) {
     try {
       if (!targetSubstring) return false;
       const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
@@ -2580,6 +2661,16 @@
     if (!introducedVersion) return;
     GM_setValue(`cfg_feature_seen_${featureKey}`, introducedVersion);
   }
+  const BADGE_SEED_KEY = "cfg_feature_seen___seeded";
+  function ensureBadgeSeeded() {
+    try {
+      if (GM_getValue(BADGE_SEED_KEY, null)) return;
+      const keys = Object.keys(NEW_FEATURES);
+      const hasAnyRecord = keys.some((k) => GM_getValue(`cfg_feature_seen_${k}`, "") !== "");
+      if (!hasAnyRecord) keys.forEach(markFeatureSeen);
+      GM_setValue(BADGE_SEED_KEY, true);
+    } catch (e) {  }
+  }
   function getUnseenFeatureKeys() {
     return Object.keys(NEW_FEATURES).filter(isFeatureNew);
   }
@@ -2602,28 +2693,24 @@
       for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
       return btoa(binary);
     }
+    if (platform !== "grok" && GM_getValue("cfg_auto_send", false)) forceSend = true;
     if (platform === "grok") {
-      const encoded = encodePayload(text);
-      return `${GROK_URL}#gfc|${forceSend ? "1" : "0"}|${encoded}`;
+      const nonce = stashNonce("grok");
+      return `${GROK_URL}#gfc|${forceSend ? "1" : "0"}|${nonce}|${encodePayload(text)}`;
     }
     if (platform === "chatgpt") {
-      await GM_setValue("chatgpt_payload", text);
-      await GM_setValue("chatgpt_force_send", forceSend);
-      await GM_setValue("chatgpt_ts", Date.now());
+      await stashPayload("chatgpt", text, forceSend);
       return `https://chatgpt.com/?prompt=${encodeURIComponent(text)}&temporary-chat=true`;
     }
     if (platform === "gemini") {
-      await GM_setValue("gemini_payload", text);
-      await GM_setValue("gemini_force_send", forceSend);
-      await GM_setValue("gemini_ts", Date.now());
-      const encoded = encodePayload(text);
-      return `https://gemini.google.com/#gfc|${forceSend ? "1" : "0"}|${encoded}`;
+      await stashPayload("gemini", text, forceSend);
+      const nonce = stashNonce("gemini");
+      return `https://gemini.google.com/#gfc|${forceSend ? "1" : "0"}|${nonce}|${encodePayload(text)}`;
     }
     if (platform === "meta") {
-      await GM_setValue("meta_payload", text);
-      await GM_setValue("meta_force_send", forceSend);
-      await GM_setValue("meta_ts", Date.now());
-      return `https://www.meta.ai/?q=${encodeURIComponent(text)}`;
+      await stashPayload("meta", text, forceSend);
+      const metaQ = encodeURIComponent(text);
+      return metaQ.length <= META_Q_URL_MAX ? `https://www.meta.ai/?q=${metaQ}` : "https://www.meta.ai/";
     }
     console.warn(`[GrokCheck] buildTabUrl: unknown platform "${platform}"`);
     return null;
@@ -2660,7 +2747,7 @@
       iconEl.className = "gfc-plat-item-icon";
       iconEl.style.color = "#1d9bf0";
       iconEl.style.background = "#1d9bf01A";
-      iconEl.innerHTML = ICONS.TEMPLATE;
+      setHTML(iconEl, ICONS.TEMPLATE);
       item.appendChild(iconEl);
 
       const nameEl = document.createElement("span");
@@ -2721,7 +2808,7 @@
     gearBtn.type = "button";
     gearBtn.className = "gfc-plat-gear-btn";
     gearBtn.title = LangSystem.getText("open_settings_tooltip");
-    gearBtn.innerHTML = ICONS.GEAR;
+    setHTML(gearBtn, ICONS.GEAR);
     if (hasUnseenGearIndicator()) {
       const gearBadge = document.createElement("span");
       gearBadge.className = "gfc-new-badge";
@@ -2746,7 +2833,7 @@
       iconEl.className = "gfc-plat-item-icon";
       iconEl.style.color = color;
       iconEl.style.background = `${color}1A`;
-      iconEl.innerHTML = getPlatformIcon(key);
+      setHTML(iconEl, getPlatformIcon(key));
       item.appendChild(iconEl);
 
       const nameEl = document.createElement("span");
@@ -2755,7 +2842,7 @@
 
       item.addEventListener("click", async (e) => {
         e.stopPropagation();
-        btnEl.innerHTML = getPlatformIcon(key);
+        setHTML(btnEl, getPlatformIcon(key));
         const payload = resolvePayload(key);
         const url = await buildTabUrl(key, payload, false);
         if (url) GM_openInTab(url, { active: getOpenBehavior(key) });
@@ -2781,9 +2868,9 @@
       btn.setAttribute("role", "button");
     }
     const _initPlatforms = getEnabledPlatforms();
-    btn.innerHTML = getPlatformIcon(
-      (_initPlatforms.length === 1 && _initPlatforms[0] !== "grok") ? _initPlatforms[0] : "grok"
-    );
+    const _idleIconKey = (_initPlatforms.length === 1 && _initPlatforms[0] !== "grok") ? _initPlatforms[0] : "grok";
+    let _isSending = false;
+    setHTML(btn, getPlatformIcon(_idleIconKey));
     btn.title = LangSystem.getText("btn_title");
     let pressTimer = null;
     let isLongPress = false;
@@ -2798,25 +2885,28 @@
       btn.style.transition = "transform 1s ease-out";
       pressTimer = setTimeout(() => {
         isLongPress = true;
-        btn.innerHTML = ICONS.ROCKET;
+        setHTML(btn, ICONS.ROCKET);
         btn.classList.add("charging");
       }, 1000);
     });
+    function resetBtnVisual() {
+      btn.classList.remove("charging");
+      btn.style.transition = "all 0.2s";
+      btn.style.transform = "scale(1)";
+      if (!_isSending) setHTML(btn, getPlatformIcon(_idleIconKey));
+    }
+    function flashSending(restoreKey) {
+      _isSending = true;
+      setHTML(btn, ICONS.SENDING);
+      setTimeout(() => { _isSending = false; setHTML(btn, getPlatformIcon(restoreKey)); }, 2000);
+    }
     btn.addEventListener("mouseleave", () => {
       if (pressTimer) {
         clearTimeout(pressTimer);
         pressTimer = null;
       }
-      if (!isLongPress) {
-        btn.classList.remove("charging");
-        btn.style.transition = "all 0.2s";
-        btn.style.transform = "scale(1)";
-        if (btn.innerHTML !== ICONS.SENDING) {
-          btn.innerHTML = getPlatformIcon(
-            (_initPlatforms.length === 1 && _initPlatforms[0] !== "grok") ? _initPlatforms[0] : "grok"
-          );
-        }
-      }
+      isLongPress = false;
+      resetBtnVisual();
     });
     btn.addEventListener("mouseup", async (e) => {
       if (e.button !== 0) return;
@@ -2824,34 +2914,49 @@
       e.stopPropagation();
       e.preventDefault();
 
+      const longPress = isLongPress;
+      isLongPress = false;
+      resetBtnVisual();
       const url = getUrlFn();
       if (!url) return;
-
-      btn.classList.remove("charging");
-      btn.style.transition = "all 0.2s";
-      btn.style.transform = "scale(1)";
 
       async function proceedWithPrompt(currentPrompt) {
         const platforms = getEnabledPlatforms();
 
-        function buildPayloadFor(_platform) {
+        function buildPayloadFor(platform) {
           const content = getContentFn ? getContentFn() : "";
           if (content && content.trim()) {
-            return `${currentPrompt}\n"${content.trim()}"\n\n${url}`;
+            const head = `${currentPrompt}\n"`;
+            const tail = `"\n\n${url}`;
+            const room = PAYLOAD_MAX_LEN - head.length - tail.length;
+            if (room > 1) {
+              const isChatGPT = platform === "chatgpt";
+              const encLen = (b) => encodeURIComponent(head + b + tail).length;
+              let body = content.trim();
+              if (body.length > room || (isChatGPT && encLen(body) > CHATGPT_URL_BUDGET)) {
+                let cut = Math.min(body.length, room - 1);
+                body = body.slice(0, cut);
+                while (isChatGPT && cut > 20 && encLen(body + "…") > CHATGPT_URL_BUDGET) {
+                  cut = Math.floor(cut * 0.9);
+                  body = body.slice(0, cut);
+                }
+                if (/[\ud800-\udbff]$/.test(body)) body = body.slice(0, -1);
+                body += "…";
+              }
+              return head + body + tail;
+            }
           }
           return `${currentPrompt}${url}`;
         }
 
-        if (isLongPress) {
+        if (longPress) {
           const target = platforms.includes("grok") ? "grok" : platforms[0];
-          btn.innerHTML = ICONS.SENDING;
-          setTimeout(() => { btn.innerHTML = getPlatformIcon(target); }, 2000);
+          flashSending(target);
           const tabUrl = await buildTabUrl(target, buildPayloadFor(target), true);
           if (tabUrl) GM_openInTab(tabUrl, { active: getOpenBehavior(target) });
         } else if (platforms.length === 1) {
           const platform = platforms[0];
-          btn.innerHTML = ICONS.SENDING;
-          setTimeout(() => { btn.innerHTML = getPlatformIcon(platform); }, 2000);
+          flashSending(platform);
           const tabUrl = await buildTabUrl(platform, buildPayloadFor(platform), false);
           if (tabUrl) GM_openInTab(tabUrl, { active: getOpenBehavior(platform) });
         } else {
@@ -2872,14 +2977,18 @@
   }
 
   const AdapterX = {
-    isMatch: () =>
-      location.hostname.includes("twitter.com") ||
-      location.hostname.includes("x.com"),
+    isMatch: () => /(^|\.)(x|twitter)\.com$/.test(location.hostname),
     init: () => {
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          mutation.addedNodes.forEach((node) => {
-            if (node.nodeType !== 1) return;
+      if (AdapterX._started) return;
+      AdapterX._started = true;
+      const pending = new Set();
+      let queued = false;
+      const flush = () => {
+        if (!queued) return;
+        queued = false;
+        pending.forEach((node) => {
+          if (!node.isConnected) return;
+          try {
             if (node.tagName === "ARTICLE") {
               AdapterX.insertBtn(node);
             } else {
@@ -2887,8 +2996,19 @@
               const ancestor = node.closest?.("article");
               if (ancestor) AdapterX.insertBtn(ancestor);
             }
-          });
+          } catch (e) { console.warn("[GFC] AdapterX insert error:", e); }
         });
+        pending.clear();
+      };
+      const observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          for (const n of m.addedNodes) if (n.nodeType === 1) pending.add(n);
+        }
+        if (pending.size && !queued) {
+          queued = true;
+          requestAnimationFrame(flush);
+          setTimeout(flush, 300);
+        }
       });
       observer.observe(document.body, { childList: true, subtree: true });
       document.querySelectorAll("article").forEach(AdapterX.insertBtn);
@@ -2929,17 +3049,23 @@
     isMatch: () => location.hostname.includes("threads"),
     init: () => {
       AdapterThreads.scan();
-      const observer = new MutationObserver(() => AdapterThreads.scan());
+      const observer = new MutationObserver(makeFrameThrottled(() => AdapterThreads.scan()));
       observer.observe(document.body, { childList: true, subtree: true });
     },
     scan: () => {
       const svgs = document.querySelectorAll(
+        'svg[title*="分享"], svg[title*="Share"], svg[title*="Send"], svg[title*="Repost"], svg[title*="轉發"], ' +
         'svg[aria-label*="分享"], svg[aria-label*="Share"], svg[aria-label*="Send"], svg[aria-label*="Repost"]',
       );
       svgs.forEach((svg) => {
         const btnRole = svg.closest('[role="button"]');
         if (!btnRole) return;
-        const toolbar = btnRole.parentElement;
+        let toolbar = btnRole.parentElement;
+        let hops = 1;
+        while (toolbar && toolbar.querySelectorAll('[role="button"]').length < 2 && hops < 6) {
+          toolbar = toolbar.parentElement;
+          hops++;
+        }
         if (!toolbar) return;
         if (toolbar.querySelector(".my-grok-robot-btn")) return;
         const postContainer = toolbar.closest('[data-pressable-container="true"]')
@@ -2973,8 +3099,8 @@
         if (!current) break;
         const postLink = current.querySelector('a[href*="/post/"]');
         if (postLink) {
-          const href = postLink.getAttribute("href");
-          return `https://www.threads.net${href}`;
+          const href = postLink.getAttribute("href").replace(/\/media\/?$/, "");
+          return `${location.origin}${href}`;
         }
         current = current.parentElement;
       }
@@ -2987,7 +3113,7 @@
     isMatch: () => location.hostname === "bsky.app",
     init: () => {
       AdapterBluesky.scan();
-      const observer = new MutationObserver(() => AdapterBluesky.scan());
+      const observer = new MutationObserver(makeFrameThrottled(() => AdapterBluesky.scan()));
       observer.observe(document.body, { childList: true, subtree: true });
       console.log("[GrokCheck] Bluesky adapter activated");
     },
@@ -3039,14 +3165,9 @@
   };
 
   const AdapterMastodon = {
-    isMatch: () =>
-      location.hostname.includes("mastodon") ||
-      !!document.querySelector(
-        ".status__action-bar, .detailed-status__action-bar",
-      ),
     init: () => {
       AdapterMastodon.scan();
-      const observer = new MutationObserver(() => AdapterMastodon.scan());
+      const observer = new MutationObserver(makeFrameThrottled(() => AdapterMastodon.scan()));
       observer.observe(document.body, { childList: true, subtree: true });
       console.log("[GrokCheck] Mastodon adapter activated");
     },
@@ -3077,56 +3198,121 @@
         });
     },
     getUrl: (post) => {
-      const link = post.querySelector('a[href*="/@"][href*="/"]');
-      if (link) return link.href;
+      const permalink = post.querySelector("a.status__relative-time, a.detailed-status__datetime");
+      if (permalink && permalink.href) return permalink.href;
+      const candidates = post.querySelectorAll('a[href*="/@"]');
+      for (const a of candidates) {
+        if (/\/@[^/]+\/\d+/.test(a.getAttribute("href") || "")) return a.href;
+      }
       return window.location.href;
     },
   };
+
+  const PAYLOAD_MAX_LEN = 5000;
+  const CHATGPT_URL_BUDGET = 8000;
+  const META_Q_URL_MAX = 6000;
+  const PAYLOAD_TTL_MS = 30000;
+  const NONCE_TTL_MS = 60000;
 
   function decodeGfcHash(hash, label) {
     if (!hash.startsWith("#gfc|")) return null;
     try {
       const parts = hash.slice(1).split("|");
-      if (parts.length < 3) return null;
+      if (parts.length < 4) return null;
       const forceSend = parts[1] === "1";
-      const bytes = Uint8Array.from(atob(parts.slice(2).join("|")), c => c.charCodeAt(0));
+      const nonce = parts[2];
+      if (!/^[0-9a-f]{8,64}$/.test(nonce)) return null;
+      const bytes = Uint8Array.from(atob(parts.slice(3).join("|")), c => c.charCodeAt(0));
       const payload = new TextDecoder().decode(bytes);
-      if (payload.length > 5000 || /[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(payload)) {
+      if (payload.length > PAYLOAD_MAX_LEN || /[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(payload)) {
         console.warn(`[GrokCheck] ${label}: suspicious payload rejected (length or control chars).`);
         return null;
       }
-      return { forceSend, payload };
+      return { forceSend, nonce, payload };
     } catch (e) { return null; }
+  }
+
+  function clearGfcHash() {
+    try { history.replaceState(history.state, "", location.pathname + location.search); } catch (_) {}
+  }
+
+  function _readNonces(platform) {
+    try {
+      const arr = JSON.parse(GM_getValue(`${platform}_nonces`, "[]"));
+      const now = Date.now();
+      return Array.isArray(arr)
+        ? arr.filter((e) => e && typeof e.n === "string" && now - e.t < NONCE_TTL_MS)
+        : [];
+    } catch (e) { return []; }
+  }
+  function stashNonce(platform) {
+    const bytes = new Uint8Array(8);
+    crypto.getRandomValues(bytes);
+    const nonce = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+    const list = _readNonces(platform).slice(-4);
+    list.push({ n: nonce, t: Date.now() });
+    GM_setValue(`${platform}_nonces`, JSON.stringify(list));
+    return nonce;
+  }
+  function consumeHashNonce(platform, nonce) {
+    const list = _readNonces(platform);
+    const i = list.findIndex((e) => e.n === nonce);
+    if (i === -1) return false;
+    list.splice(i, 1);
+    GM_setValue(`${platform}_nonces`, JSON.stringify(list));
+    return true;
+  }
+
+  async function stashPayload(platform, text, forceSend) {
+    await GM_setValue(`${platform}_payload`, text);
+    await GM_setValue(`${platform}_force_send`, forceSend);
+    await GM_setValue(`${platform}_ts`, Date.now());
+  }
+  function clearStashedPayload(platform) {
+    GM_setValue(`${platform}_ts`, 0);
+    GM_setValue(`${platform}_payload`, "");
+    GM_setValue(`${platform}_force_send`, false);
+  }
+  function consumePayload(platform) {
+    const payload = GM_getValue(`${platform}_payload`, "");
+    if (!payload) return null;
+    const fresh = (Date.now() - GM_getValue(`${platform}_ts`, 0)) < PAYLOAD_TTL_MS;
+    const forceSend = GM_getValue(`${platform}_force_send`, false);
+    clearStashedPayload(platform);
+    return fresh ? { payload, forceSend } : null;
+  }
+  function waitForStashedPayload(platform, onFound, onMiss, tries = 8, intervalMs = 250) {
+    const attempt = (left) => {
+      const data = consumePayload(platform);
+      if (data) return onFound(data);
+      if (left > 0) return setTimeout(() => attempt(left - 1), intervalMs);
+      if (onMiss) onMiss();
+    };
+    attempt(tries);
   }
 
   function init() {
     console.log(`[GrokCheck] init() 啟動，hostname=${window.location.hostname}`);
-    registerMenus();
     if (!GM_getValue("cfg_lang_code")) {
-      let defaultCode = "en";
-      const navLang = navigator.language.toLowerCase();
-      if (navLang.includes("zh-hant") || navLang.includes("zh-tw") || navLang.includes("zh-hk")) defaultCode = "zh-TW";
-      else if (navLang.includes("zh-hans") || navLang.includes("zh-cn") || navLang.includes("zh")) defaultCode = "zh-CN";
-      else if (navLang.includes("ja")) defaultCode = "ja";
-      else if (navLang.includes("ko")) defaultCode = "ko";
-      else if (navLang.includes("pt")) defaultCode = "pt-BR";
-      else if (navLang.includes("fr")) defaultCode = "fr";
-      else if (navLang.includes("es")) defaultCode = "es";
-
-      GM_setValue("cfg_lang_code", defaultCode);
+      const defaultCode = detectBrowserLang();
+      LangSystem.setKey(defaultCode);
       console.log(
         `[GrokCheck] First run detected. Language auto-detected: ${defaultCode}.`,
       );
     }
+    ensureBadgeSeeded();
+    registerMenus();
 
-    if (window.location.href.includes("/i/grok")) {
+    const isGrokPage = () => AdapterX.isMatch() && location.pathname.startsWith("/i/grok");
+    if (isGrokPage()) {
       function parseHashPayload() {
         return decodeGfcHash(location.hash, "Grok");
       }
 
       function tryRunAutomation(retriesLeft) {
         const hashData = parseHashPayload();
-        if (hashData) {
+        if (hashData && consumeHashNonce("grok", hashData.nonce)) {
+          clearGfcHash();
           runGrokAutomation(hashData);
         } else if (retriesLeft > 0) {
           setTimeout(() => tryRunAutomation(retriesLeft - 1), 200);
@@ -3153,6 +3339,10 @@
         if (_obsDebounce) return;
         _obsDebounce = setTimeout(() => {
           _obsDebounce = null;
+          if (!isGrokPage()) {
+            if (AdapterX.isMatch()) AdapterX.init();
+            return;
+          }
           removeGrokAds();
         }, 200);
       });
@@ -3162,33 +3352,19 @@
         obs.disconnect();
       });
     } else if (window.location.hostname === "chatgpt.com") {
-      const ts       = GM_getValue("chatgpt_ts", 0);
-      const isRecent = (Date.now() - ts) < 30000;
-      const payload = GM_getValue("chatgpt_payload", "");
-      if (isRecent && payload) {
-        const forceSend = GM_getValue("chatgpt_force_send", false);
-        GM_setValue("chatgpt_ts", 0);
-        GM_setValue("chatgpt_payload", "");
-        GM_setValue("chatgpt_force_send", false);
+      waitForStashedPayload("chatgpt", ({ payload, forceSend }) => {
         const delay = document.readyState === "loading" ? 2000 : 1500;
-        const run = () => setTimeout(() => runChatGPTAutomation(forceSend, payload), delay);
+        const run = () => setTimeout(() => runChatGPTAutomation(payload, forceSend), delay);
         if (document.readyState === "loading") {
           document.addEventListener("DOMContentLoaded", run);
         } else {
           run();
         }
-      }
+      });
     } else if (window.location.hostname === "www.meta.ai") {
-      const ts       = GM_getValue("meta_ts", 0);
-      const isRecent = (Date.now() - ts) < 30000;
-      const payload  = GM_getValue("meta_payload", "");
-      console.log(`[GrokCheck][Meta] hostname 分流觸發，ts=${ts}，isRecent=${isRecent}，payload長度=${payload.length}`);
-      if (isRecent && payload) {
-        const forceSend = GM_getValue("meta_force_send", false);
+      console.log("[GrokCheck][Meta] hostname 分流觸發，等待 GM storage payload");
+      waitForStashedPayload("meta", ({ payload, forceSend }) => {
         console.log(`[GrokCheck][Meta] 條件成立，forceSend=${forceSend}，即將排程 runMetaAutomation`);
-        GM_setValue("meta_ts", 0);
-        GM_setValue("meta_payload", "");
-        GM_setValue("meta_force_send", false);
         const delay = document.readyState === "loading" ? 2000 : 1500;
         const run = () => setTimeout(() => runMetaAutomation(payload, forceSend), delay);
         if (document.readyState === "loading") {
@@ -3196,29 +3372,30 @@
         } else {
           run();
         }
-      } else {
-        console.warn("[GrokCheck][Meta] 條件不成立，automation 不會執行（isRecent 為 false 或 payload 為空）");
-      }
+      }, () => {
+        console.warn("[GrokCheck][Meta] 無有效 payload，automation 不會執行（一般瀏覽、已逾時或 payload 為空）");
+      });
     } else if (window.location.hostname === "gemini.google.com") {
       function parseGeminiHashPayload() {
         return decodeGfcHash(location.hash, "Gemini");
       }
 
-      function tryRunGemini() {
+      function tryRunGemini(retriesLeft = 6) {
         const data = parseGeminiHashPayload();
-        if (data) {
+        if (data && consumeHashNonce("gemini", data.nonce)) {
+          clearStashedPayload("gemini");
+          clearGfcHash();
           runGeminiAutomation(data.payload, data.forceSend);
           return;
         }
-        const ts      = GM_getValue("gemini_ts", 0);
-        const payload = GM_getValue("gemini_payload", "");
-        const force   = GM_getValue("gemini_force_send", false);
-        if (payload && (Date.now() - ts) < 30000) {
-          GM_setValue("gemini_payload", "");
-          GM_setValue("gemini_force_send", false);
-          GM_setValue("gemini_ts", 0);
-          runGeminiAutomation(payload, force);
+        const backup = consumePayload("gemini");
+        if (backup) {
+          if (data) consumeHashNonce("gemini", data.nonce);
+          clearGfcHash();
+          runGeminiAutomation(backup.payload, backup.forceSend);
+          return;
         }
+        if (retriesLeft > 0) setTimeout(() => tryRunGemini(retriesLeft - 1), 400);
       }
 
       if (document.readyState === "loading") {
@@ -3236,7 +3413,7 @@
         console.log("[GrokCheck] X adapter activated");
         AdapterX.init();
       } else {
-        const mastodonObserver = new MutationObserver(() => {
+        const mastodonObserver = new MutationObserver(makeFrameThrottled(() => {
           if (
             document.querySelector(
               ".status__action-bar, .detailed-status__action-bar",
@@ -3245,7 +3422,7 @@
             mastodonObserver.disconnect();
             AdapterMastodon.init();
           }
-        });
+        }));
         mastodonObserver.observe(document.body, {
           childList: true,
           subtree: true,
