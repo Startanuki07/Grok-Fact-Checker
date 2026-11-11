@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.6.5.13
+// @version      1.6.5.15
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -2065,7 +2065,6 @@
     const maxAttempts = 40;
     const BTN_RETRY_LIMIT = 12;
     let hasClickedPrivacy = false;
-    let hasClickedFocus = false;
 
     function findGrokComposer() {
       return findAny([
@@ -2102,41 +2101,7 @@
           }
         }
 
-        if (!hasClickedFocus) {
-          const focusLabels = [
-            "聚焦模式", "Focus Mode", "集中モード",
-            "フォーカスモード", "フォーカスモードを修了",
-            "집중 모드", "Modo enfoque", "Mode concentration",
-            "Modo foco", "Mode Concentration", "Modo de enfoque",
-          ];
-          let focusBtn = null;
-          let matchedLabel = null;
-          for (const label of focusLabels) {
-            const btn = document.querySelector(
-              `button[aria-label="${label}"], [role="button"][aria-label="${label}"]`,
-            );
-            if (btn) { focusBtn = btn; matchedLabel = label; break; }
-          }
-          if (!focusBtn) {
-            for (const path of document.querySelectorAll("button svg path")) {
-              const d = path.getAttribute("d") ?? "";
-              if (d.startsWith("M3 5.5C3 4.12") || d.startsWith("M10.59 12L4.54")) {
-                focusBtn = path.closest("button");
-                matchedLabel = `SVG:${d.slice(0, 20)}`;
-                break;
-              }
-            }
-          }
-          if (focusBtn) {
-            safeSimulateClick(focusBtn);
-            hasClickedFocus = true;
-          }
-          if (!hasClickedFocus && attempts >= BTN_RETRY_LIMIT) {
-            hasClickedFocus = true;
-          }
-        }
-
-        if (!hasClickedPrivacy || !hasClickedFocus) return;
+        if (!hasClickedPrivacy) return;
 
         let textarea = findGrokComposer();
         let isEditable = !!(textarea && textarea.tagName !== "TEXTAREA");
@@ -3187,32 +3152,45 @@
     },
     scan: () => {
       document
-        .querySelectorAll(".status__action-bar, .detailed-status__action-bar")
+        .querySelectorAll(".status__action-bar, .detailed-status__action-bar, ._comp_status__actions")
         .forEach((bar) => {
           if (bar.querySelector(".my-grok-robot-btn")) return;
-          const post = bar.closest(".status, .detailed-status");
+          const isNewUI = bar.classList.contains("_comp_status__actions");
+          const post = isNewUI
+            ? bar.closest("article[data-id]")
+            : bar.closest(".status, .detailed-status");
           if (!post) return;
-          if (post.classList.contains("status-reply")) return;
+          if (!isNewUI && post.classList.contains("status-reply")) return;
 
           const robotBtn = createGrokButton(
-            () => AdapterMastodon.getUrl(post),
+            () => AdapterMastodon.getUrl(post, isNewUI),
             false,
             () => {
-              const contentEl = post.querySelector('.status__content p, .status__content__text');
+              const contentEl = post.querySelector(
+                '.status__content p, .status__content__text, ._comp_status_content__text',
+              );
               return contentEl ? (contentEl.innerText?.trim() || "") : "";
             },
           );
           robotBtn.style.marginLeft = "8px";
 
-          const lastWrapper = bar.querySelector(
-            ".status__action-bar__button-wrapper:last-child",
-          );
-          if (lastWrapper) lastWrapper.after(robotBtn);
-          else bar.appendChild(robotBtn);
+          if (isNewUI) {
+            bar.appendChild(robotBtn);
+          } else {
+            const lastWrapper = bar.querySelector(
+              ".status__action-bar__button-wrapper:last-child",
+            );
+            if (lastWrapper) lastWrapper.after(robotBtn);
+            else bar.appendChild(robotBtn);
+          }
         });
     },
-    getUrl: (post) => {
-      const permalink = post.querySelector("a.status__relative-time, a.detailed-status__datetime");
+    getUrl: (post, isNewUI) => {
+      const permalink = post.querySelector(
+        isNewUI
+          ? "a._comp_status_header__date"
+          : "a.status__relative-time, a.detailed-status__datetime",
+      );
       if (permalink && permalink.href) return permalink.href;
       const candidates = post.querySelectorAll('a[href*="/@"]');
       for (const a of candidates) {
@@ -3427,12 +3405,10 @@
         console.log("[GrokCheck] X adapter activated");
         AdapterX.init();
       } else {
+        const MASTODON_ACTION_BAR_SELECTOR =
+          ".status__action-bar, .detailed-status__action-bar, ._comp_status__actions";
         const mastodonObserver = new MutationObserver(makeFrameThrottled(() => {
-          if (
-            document.querySelector(
-              ".status__action-bar, .detailed-status__action-bar",
-            )
-          ) {
+          if (document.querySelector(MASTODON_ACTION_BAR_SELECTOR)) {
             mastodonObserver.disconnect();
             AdapterMastodon.init();
           }
@@ -3441,11 +3417,7 @@
           childList: true,
           subtree: true,
         });
-        if (
-          document.querySelector(
-            ".status__action-bar, .detailed-status__action-bar",
-          )
-        ) {
+        if (document.querySelector(MASTODON_ACTION_BAR_SELECTOR)) {
           mastodonObserver.disconnect();
           AdapterMastodon.init();
         }
