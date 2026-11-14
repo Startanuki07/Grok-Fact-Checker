@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.6.5.15
+// @version      1.6.5.16
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -707,6 +707,8 @@
 
   const CUSTOM_TEMPLATE_LIMIT = 10;
 
+  const CUSTOM_TEMPLATE_MAX_LEN = 3000;
+
   function getCustomTemplates() {
     const raw = GM_getValue("cfg_custom_templates", null);
     if (raw !== null) {
@@ -1306,6 +1308,7 @@
       const contentTextarea = document.createElement("textarea");
       contentTextarea.className = "grok-custom-textarea";
       contentTextarea.placeholder = LangSystem.getText("custom_prompt_placeholder");
+      contentTextarea.maxLength = CUSTOM_TEMPLATE_MAX_LEN;
       contentTextarea.value = tpl.content || "";
       contentTextarea.style.minHeight = "70px";
       contentTextarea.style.resize = "vertical";
@@ -1469,7 +1472,7 @@
     langLabel.innerText = LangSystem.getText("lang_section_title");
     langCard.appendChild(langLabel);
 
-    const currentCode = GM_getValue("cfg_lang_code", null);
+    const currentCode = LangSystem.getKey();
     const initialLangCode = currentCode || detectBrowserLang();
     let selectedLangCode = initialLangCode;
     LangSystem._syncCustomIntoDict();
@@ -3285,7 +3288,7 @@
 
   function init() {
     console.log(`[GrokCheck] init() 啟動，hostname=${window.location.hostname}`);
-    if (!GM_getValue("cfg_lang_code")) {
+    if (!LangSystem.getKey()) {
       const defaultCode = detectBrowserLang();
       LangSystem.setKey(defaultCode);
       console.log(
