@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.6.5.16
+// @version      1.6.6.2
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -942,11 +942,6 @@
             0%, 100% { box-shadow: 0 0 0 0 rgba(244,33,46,0.5); }
             50%      { box-shadow: 0 0 0 4px rgba(244,33,46,0); }
         }
-        .gfc-new-badge-inline {
-            display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-            background: #f4212e; flex-shrink: 0; pointer-events: none;
-            animation: gfc-new-pulse 1.6s ease-in-out infinite;
-        }
         .gfc-new-badge-pill {
             display: inline-block; padding: 1px 6px; border-radius: 4px;
             background: #f4212e; color: #fff; font-size: 10px; font-weight: 700;
@@ -1053,8 +1048,6 @@
         .grok-unsaved-btn.primary { background: #1d9bf0; color: white; }
         .grok-unsaved-btn.danger  { background: transparent; color: #f4212e; border: 1px solid #f4212e; }
         .grok-unsaved-btn.ghost   { background: transparent; color: #8899a6; border: 1px solid #536471; }
-        .grok-unsaved-row { display: flex; gap: 10px; width: 100%; }
-        .grok-unsaved-row .grok-unsaved-btn { width: auto; flex: 1; }
     `);
 
   function findAny(selectors, root = document) {
@@ -1993,7 +1986,7 @@
   }
 
   function findPrivacyButton() {
-    const ariaLabels = [
+    const labels = [
       "私人",
       "非公開",
       "Private",
@@ -2006,11 +1999,18 @@
       "Privat",
       "Privato",
     ];
-    for (const label of ariaLabels) {
+    for (const label of labels) {
       const btn = document.querySelector(
         `button[aria-label="${label}"], [role="button"][aria-label="${label}"]`,
       );
-      if (btn) return btn;
+      if (btn) return { el: btn, isPressed: btn.getAttribute("aria-pressed") === "true" };
+    }
+    const headerBtns = document.querySelectorAll("header button, header [role='button']");
+    for (const btn of headerBtns) {
+      const text = (btn.textContent || "").trim();
+      if (labels.some((label) => text === label || text.endsWith(label))) {
+        return { el: btn, isPressed: btn.getAttribute("aria-pressed") === "true" };
+      }
     }
     return null;
   }
@@ -2040,15 +2040,13 @@
     }
   }
 
-  let _automationRunning = false;
   let _grokAutomationRan = false;
 
   function runGrokAutomation(hashData = null) {
     const payload   = hashData?.payload   ?? "";
     const forceSend = hashData?.forceSend ?? false;
     if (!payload) { console.warn("[GrokCheck] runGrokAutomation: no payload, abort"); return; }
-    if (_automationRunning || _grokAutomationRan) return;
-    _automationRunning = true;
+    if (_grokAutomationRan) return;
     _grokAutomationRan = true;
     const t0 = Date.now();
     const ts = () => `+${Date.now() - t0}ms`;
@@ -2093,9 +2091,11 @@
 
         if (!hasClickedPrivacy) {
           const privacyBtn = findPrivacyButton();
-          const privacyLabel = privacyBtn?.getAttribute("aria-label") ?? "null";
-          if (privacyBtn) {
-            safeSimulateClick(privacyBtn);
+          if (privacyBtn && privacyBtn.isPressed) {
+            hasClickedPrivacy = true;
+            updateCurtainText(LangSystem.getText("privacy_check"), statusTitle);
+          } else if (privacyBtn) {
+            safeSimulateClick(privacyBtn.el);
             hasClickedPrivacy = true;
             updateCurtainText(LangSystem.getText("privacy_check"), statusTitle);
           } else if (attempts >= BTN_RETRY_LIMIT) {
@@ -2123,7 +2123,7 @@
                 requestAnimationFrame(() => {
                   try {
                     if (isEditable) {
-                      highlightUrlInContenteditable(textarea, payload, payload.slice(urlStart));
+                      highlightUrlInContenteditable(textarea, payload.slice(urlStart));
                     } else {
                       textarea.focus();
                       textarea.setSelectionRange(urlStart, payload.length);
@@ -2137,8 +2137,6 @@
             highlightDone.then(() => {
               if (shouldSend) {
                 updateCurtainText(LangSystem.getText("sending"), statusTitle);
-
-                const sendBtnPre = findSendButton();
 
                 let sendFired = false;
                 function fireSend(trigger) {
@@ -2221,7 +2219,6 @@
   }
 
   function cleanup() {
-    _automationRunning = false;
     try { hideCurtain(800); } catch (e) {}
   }
 
@@ -2278,7 +2275,7 @@
                 if (urlStart !== -1) {
                   requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
-                      highlightUrlInContenteditable(editor, payload, payload.slice(urlStart));
+                      highlightUrlInContenteditable(editor, payload.slice(urlStart));
                       finish();
                     });
                   });
@@ -2408,7 +2405,7 @@
             clearInterval(hlInterval);
             requestAnimationFrame(() => {
               requestAnimationFrame(() => {
-                highlightUrlInContenteditable(editor, payload, payload.slice(urlStart));
+                highlightUrlInContenteditable(editor, payload.slice(urlStart));
                 finish();
               });
             });
@@ -2471,7 +2468,7 @@
           if (urlStart === -1) return finish();
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-              highlightUrlInContenteditable(editor, payload, payload.slice(urlStart));
+              highlightUrlInContenteditable(editor, payload.slice(urlStart));
               finish();
             });
           });
@@ -2568,7 +2565,7 @@
     });
   }
 
-  function highlightUrlInContenteditable(editor, _fullText, targetSubstring) {
+  function highlightUrlInContenteditable(editor, targetSubstring) {
     try {
       if (!targetSubstring) return false;
       const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
@@ -2753,12 +2750,8 @@
     setTimeout(() => document.addEventListener("click", closeHandler, true), 0);
   }
 
-  function showPlatformDropdown(anchorEl, textOrFn, btnEl, buildPayloadFor) {
+  function showPlatformDropdown(anchorEl, btnEl, buildPayloadFor) {
     document.querySelector(".gfc-plat-drop")?.remove();
-
-    const resolvePayload = typeof buildPayloadFor === "function"
-      ? buildPayloadFor
-      : () => (typeof textOrFn === "string" ? textOrFn : "");
 
     const platforms = getEnabledPlatforms();
     const rect = anchorEl.getBoundingClientRect();
@@ -2825,7 +2818,7 @@
       item.addEventListener("click", async (e) => {
         e.stopPropagation();
         setHTML(btnEl, getPlatformIcon(key));
-        const payload = resolvePayload(key);
+        const payload = buildPayloadFor(key);
         const url = await buildTabUrl(key, payload, false);
         if (url) GM_openInTab(url, { active: getOpenBehavior(key) });
       });
@@ -2942,7 +2935,7 @@
           const tabUrl = await buildTabUrl(platform, buildPayloadFor(platform), false);
           if (tabUrl) GM_openInTab(tabUrl, { active: getOpenBehavior(platform) });
         } else {
-          showPlatformDropdown(btn, url, btn, buildPayloadFor);
+          showPlatformDropdown(btn, btn, buildPayloadFor);
         }
       }
 
@@ -2959,6 +2952,7 @@
   }
 
   const AdapterX = {
+    _started: false,
     isMatch: () => /(^|\.)(x|twitter)\.com$/.test(location.hostname),
     init: () => {
       if (AdapterX._started) return;
@@ -2999,7 +2993,7 @@
       const toolbar = article.querySelector('div[role="group"]');
       if (!toolbar) return;
       if (toolbar.querySelector(".my-grok-robot-btn")) return;
-      if (!article.querySelector('[data-testid="tweetText"]')) return;
+      if (!article.closest('[data-href*="/status/"]')) return;
 
       const getUrl = () => {
         const linkElement = article.querySelector('a[href*="/status/"] > time');
@@ -3017,7 +3011,7 @@
       };
 
       const getContent = () => {
-        const tweetTextEl = article.querySelector('[data-testid="tweetText"]');
+        const tweetTextEl = article.querySelector('div[dir="auto"][lang]');
         return tweetTextEl ? (tweetTextEl.innerText?.trim() || "") : "";
       };
 
