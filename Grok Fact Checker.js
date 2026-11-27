@@ -9,7 +9,7 @@
 // @name:fr      Grok Vérificateur de Faits
 // @namespace    https://greasyfork.org/en/users/1575945-star-tanuki07
 // @homepageURL  https://github.com/Startanuki07
-// @version      1.6.6.2
+// @version      1.6.6.3
 // @license      MIT
 // @author       Star_tanuki07
 // @icon         https://abs.twimg.com/favicons/twitter.ico
@@ -2990,7 +2990,10 @@
       document.querySelectorAll("article").forEach(AdapterX.insertBtn);
     },
     insertBtn: (article) => {
-      const toolbar = article.querySelector('div[role="group"]');
+      const toolbarCandidates = article.querySelectorAll('div[role="group"]');
+      const toolbar = Array.from(toolbarCandidates).find(
+        (el) => el.querySelector("[data-engagement-action]"),
+      );
       if (!toolbar) return;
       if (toolbar.querySelector(".my-grok-robot-btn")) return;
       if (!article.closest('[data-href*="/status/"]')) return;
@@ -3029,10 +3032,16 @@
       observer.observe(document.body, { childList: true, subtree: true });
     },
     scan: () => {
-      const svgs = document.querySelectorAll(
+      const exactLabels = ["分享", "Share", "Send", "Repost", "轉發"];
+      const svgCandidates = document.querySelectorAll(
         'svg[title*="分享"], svg[title*="Share"], svg[title*="Send"], svg[title*="Repost"], svg[title*="轉發"], ' +
         'svg[aria-label*="分享"], svg[aria-label*="Share"], svg[aria-label*="Send"], svg[aria-label*="Repost"]',
       );
+      const svgs = Array.from(svgCandidates).filter((svg) => {
+        const title = (svg.getAttribute("title") || svg.querySelector("title")?.textContent || "").trim();
+        const ariaLabel = (svg.getAttribute("aria-label") || "").trim();
+        return exactLabels.includes(title) || exactLabels.includes(ariaLabel);
+      });
       svgs.forEach((svg) => {
         const btnRole = svg.closest('[role="button"]');
         if (!btnRole) return;
